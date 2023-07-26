@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(cbgl)
 
-add_compile_options(-std=c++11 -Ofast)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 11)
+endif()
+add_compile_options(-Ofast)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -34,12 +37,24 @@ include_directories(include
 
 link_directories(${csm_LIBRARY_DIRS})
 
-add_library(cbgl_utils_lib
+add_library(cbgl_og_utils_lib
   src/utils/occupancy_grid_utils/coordinate_conversions.cpp
   src/utils/occupancy_grid_utils/ray_tracer.cpp
 )
+add_library(cbgl_pf_utils_lib
+  src/utils/pf/pf.c
+  src/utils/pf/pf_kdtree.c
+  src/utils/pf/pf_pdf.c
+  src/utils/pf/pf_vector.c
+  src/utils/pf/eig3.c
+)
+add_library(cbgl_map_utils_lib
+  src/utils/map/map.c
+)
 
-target_link_libraries(cbgl_utils_lib
+target_link_libraries(cbgl_og_utils_lib
+  cbgl_pf_utils_lib
+  cbgl_map_utils_lib
   ${catkin_LIBRARIES}
 )
 

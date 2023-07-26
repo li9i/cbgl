@@ -68,6 +68,8 @@
 #include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
 #include <utils/fsm_core.h>
+#include "utils/map/map.h"
+#include "utils/pf/pf.h"
 
 #include <csm/csm_all.h>  // csm defines min and max, but Eigen complains
 #include <egsl/egsl_macros.h>
@@ -155,7 +157,9 @@ class CBGL
     double map_res_;
     unsigned int map_hgt_;
 
-    bool close_loop_;
+    // For generating the hypothesis set H
+    pf_t *pf_hyp_;
+    map_t* map_hyp_;
 
     bool publish_pose_with_covariance_stamped_;
 
@@ -272,6 +276,12 @@ class CBGL
     void closeLoop(const geometry_msgs::PoseWithCovarianceStamped& pose);
 
     /*****************************************************************************
+     * @brief Convert an OccupancyGrid map message into the internal
+     * representation. This allocates a map_t and returns it. Stolen from amcl.
+     */
+    map_t* convertMap(const nav_msgs::OccupancyGrid& map_msg);
+
+    /*****************************************************************************
      * @brief Copies a source LDP structure to a target one.
      * @param[in] source [const LDP&] The source structure
      * @param[out] target [LDP&] The destination structure
@@ -372,6 +382,13 @@ class CBGL
      * @return [double] The pose's yaw
      */
     double extractYawFromPose(const geometry_msgs::Pose& pose);
+
+    /*******************************************************************************
+     * @brief Calculates the area of the free space of a map
+     * @param[in] map [map_t*] Guess what
+     * @return [double] Its area
+     */
+    double freeArea(map_t* map);
 
     /*****************************************************************************
      * @brief Finds the transform between the laser frame and the base frame
@@ -581,23 +598,10 @@ class CBGL
       const tf::Transform& transform);
 
     /*****************************************************************************
-     * @brief Undersamples a LDP scan.
-     * @param[in,out] scan [LDP&] The input scan
-     * @param[in] rate [const int&] Take account of one out of every rate rays of
-     * input scan
-     * @return void
+     * @brief Pose disperser
+     * @return [pf_vector_t] Uniformly random pose set over arg
      */
-    void undersampleLDPScan(LDP& scan, const int& rate);
-
-    /*****************************************************************************
-     * @brief Undersamples a world and a map scan in LDP scan.
-     * @param[in,out] world_scan [LDP&] A world scan in LDP form
-     * @param[in,out] map_scan [LDP&] A map scan in LDP form
-     * @param[in] rate [const int&] Take account of one out of every rate rays of
-     * the input scans
-     * @return void
-     */
-    void undersampleLDPScans(LDP& world_scan, LDP& map_scan, const int& rate);
+    static pf_vector_t uniformPoseGenerator(void* arg);
 
     /*****************************************************************************
      * @brief Visualisation of world and map scans

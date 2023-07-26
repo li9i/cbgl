@@ -21,7 +21,8 @@ target_link_libraries(cbgl_lib
   cbgl_lodepng_lib
   ${catkin_LIBRARIES}
   ${csm_LIBRARIES}
-  cbgl_utils_lib)
+  cbgl_og_utils_lib
+  cbgl_pf_utils_lib)
 
 add_dependencies(cbgl_lib
   ${csm_EXPORTED_TARGETS}

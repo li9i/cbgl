@@ -63,6 +63,8 @@ CBGL::CBGL(
   rm_(ranges::RayMarching(omap_, 1)),
   cddt_(ranges::CDDTCast(omap_, 1, 1)),
   br_(ranges::BresenhamsLine(omap_, 1)),
+  pf_hyp_(NULL),
+  map_hyp_(NULL),
   num_calls_global_localisation_(0),
   num_poses_processed_(0),
   nrays_(0),
@@ -263,6 +265,39 @@ CBGL::closeLoop(
   const geometry_msgs::PoseWithCovarianceStamped& pose)
 {
   feedback_pose_publisher_.publish(pose);
+}
+
+
+/*******************************************************************************
+ * @brief Convert an OccupancyGrid map message into the internal
+ * representation. This allocates a map_t and returns it. Stolen from amcl.
+ */
+map_t*
+CBGL::convertMap(const nav_msgs::OccupancyGrid& map_msg)
+{
+  map_t* map = map_alloc();
+  ROS_ASSERT(map);
+
+  map->size_x = map_msg.info.width;
+  map->size_y = map_msg.info.height;
+  map->scale = map_msg.info.resolution;
+  map->origin_x = map_msg.info.origin.position.x + (map->size_x / 2) * map->scale;
+  map->origin_y = map_msg.info.origin.position.y + (map->size_y / 2) * map->scale;
+
+  // Convert to player format
+  map->cells = (map_cell_t*)malloc(sizeof(map_cell_t)*map->size_x*map->size_y);
+  ROS_ASSERT(map->cells);
+  for(int i=0;i<map->size_x * map->size_y;i++)
+  {
+    if(map_msg.data[i] == 0)
+      map->cells[i].occ_state = -1;
+    else if(map_msg.data[i] == 100)
+      map->cells[i].occ_state = +1;
+    else
+      map->cells[i].occ_state = 0;
+  }
+
+  return map;
 }
 
 
@@ -645,6 +680,30 @@ CBGL::dumpScan(const LDP& real_scan, const LDP& virtual_scan)
 }
 
 
+
+/*******************************************************************************
+ * @brief Calculates the area of the free space of a map
+ * @param[in] map [map_t*] Guess what
+ * @return [double] Its area
+*/
+double
+CBGL::freeArea(map_t* map)
+{
+  double area = 0.0;
+  for (unsigned int c = 0; c < map->size_x * map->size_y; c++)
+  {
+    map_cell_t* cell = map->cells + c;
+
+    if (cell->occ_state == -1)
+      area -= cell->occ_state;
+  }
+
+  area *= map->scale * map->scale;
+
+  return area;
+}
+
+
 /*******************************************************************************
  * @brief Finds the transform between the laser frame and the base frame
  * @param[in] frame_id [const::string&] The laser's frame id
@@ -801,9 +860,6 @@ CBGL::initParams()
   // **** How to publish the output?
   // tf (fixed_frame->base_frame),
   // pose message (pose of base frame in the fixed frame)
-
-  if (!nh_private_.getParam ("close_loop", close_loop_))
-    close_loop_ = false;
 
   if (!nh_private_.getParam("position_covariance", position_covariance_))
   {
@@ -1354,6 +1410,23 @@ CBGL::ldpTolaserScan(const LDP& ldp)
   void
 CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
 {
+  // Map used in dispersal of hypotheses
+  map_hyp_ = convertMap(map_msg);
+
+  // Find area
+  double area = freeArea(map_hyp_);
+
+  // TODO make these depend on the map's area
+  unsigned int min_particles_ = 40*area;
+  unsigned int max_particles_ = 40*area;
+
+
+  // The set of hypotheses
+  pf_hyp_ = pf_alloc(min_particles_, max_particles_,
+                     0.01, 0.1,
+                     (pf_init_model_fn_t)CBGL::uniformPoseGenerator,
+                     (void *)map_hyp_);
+
   map_ = map_msg;
   map_res_ = map_.info.resolution;
   map_hgt_ = map_.info.height;
@@ -1640,12 +1713,7 @@ void CBGL::processPoseCloud()
     np_msg.data = -1;
   best_particle_publisher_.publish(np_msg);
 
-  // Close the loop: feed the corrected pose to the amcl as its initial pose:
-  //if (close_loop_)
-  //closeLoop(global_pose_wcs);
-
   // Re-close down
-  //received_scan_ = false;
   received_start_signal_ = false;
 
   // Publish not busy status
@@ -2229,93 +2297,49 @@ CBGL::startSignalService(
   while(received_start_signal_)
     ros::Duration(0.1).sleep();
 
-  // Call amcl's global localisation
-  ros::ServiceClient client =
-    nh_.serviceClient<std_srvs::Empty>(global_localisation_service_);
-  std_srvs::Empty srv;
+  ROS_INFO("Initializing with uniform distribution");
+  pf_init_model(pf_hyp_, (pf_init_model_fn_t)CBGL::uniformPoseGenerator,
+    (void *)map_hyp_);
+  ROS_INFO("Global initialisation done!");
 
-  bool success = false;
 
-  if (client.call(srv))
-  {
-    ROS_INFO("--------------------------------------------------------------------------");
-    ROS_INFO("[CBGL] Successful call of global localisation");
-    ROS_INFO("[CBGL] (call no. %d)", num_poses_processed_);
-    success = true;
-  }
-  else
-  {
-    ROS_ERROR("[CBGL] Failed to call global localisation");
-    success = false;
-  }
-
-  received_start_signal_ = success;
-
-  return success;
+  received_start_signal_ = true;
+  return received_start_signal_;
 }
 
 
 /*******************************************************************************
- * @brief Undersamples a LDP scan.
- * @param[in,out] scan [LDP&] The input scan
- * @param[in] rate [const int&] Take account of one out of every rate rays of
- * input scan
- * @return void
- */
-  void
-CBGL::undersampleLDPScan(
-  LDP& scan,
-  const int& rate)
+*/
+pf_vector_t
+CBGL::uniformPoseGenerator(void* arg)
 {
-  // The undersampled scan will have scan.nrays / rate number of rays
-  int nrays = static_cast<int>(static_cast<double>(scan->nrays) / rate);
+  map_t* map = (map_t*)arg;
 
-  LDP subed_scan = ld_alloc_new(nrays);
+  double min_x, max_x, min_y, max_y;
 
-  int s = 0;
-  for (unsigned int i = 0; i < nrays; i++)
+  min_x = (map->size_x * map->scale)/2.0 - map->origin_x;
+  max_x = (map->size_x * map->scale)/2.0 + map->origin_x;
+  min_y = (map->size_y * map->scale)/2.0 - map->origin_y;
+  max_y = (map->size_y * map->scale)/2.0 + map->origin_y;
+
+  pf_vector_t p;
+
+  ROS_DEBUG("[CBGL] Generating new uniform sample");
+  for(;;)
   {
-    subed_scan->valid[i] = scan->valid[s];
-    subed_scan->theta[i] = scan->theta[s];
-    subed_scan->cluster[i] = scan->cluster[s];
-    subed_scan->readings[i] = scan->readings[s];
+    p.v[0] = min_x + drand48() * (max_x - min_x);
+    p.v[1] = min_y + drand48() * (max_y - min_y);
+    p.v[2] = drand48() * 2*M_PI - M_PI;
 
-    s += rate;
+    // Check that it's a free cell
+    int i,j;
+    i = MAP_GXWX(map, p.v[0]);
+    j = MAP_GYWY(map, p.v[1]);
+    if(MAP_VALID(map,i,j) && (map->cells[MAP_INDEX(map,i,j)].occ_state == -1))
+      break;
   }
 
-  subed_scan->nrays = nrays;
-  subed_scan->min_theta = subed_scan->theta[0];
-  subed_scan->max_theta = subed_scan->theta[nrays-1];
-
-  subed_scan->odometry[0] = scan->odometry[0];
-  subed_scan->odometry[1] = scan->odometry[1];
-  subed_scan->odometry[2] = scan->odometry[2];
-
-  subed_scan->true_pose[0] = scan->true_pose[0];
-  subed_scan->true_pose[1] = scan->true_pose[1];
-  subed_scan->true_pose[2] = scan->true_pose[2];
-
-  copyLDP(subed_scan, scan);
-  ld_free(subed_scan);
-}
-
-
-/*******************************************************************************
- * @brief Undersamples a world and a map scan in LDP scan.
- * @param[in,out] world_scan [LDP&] A world scan in LDP form
- * @param[in,out] map_scan [LDP&] A map scan in LDP form
- * @param[in] rate [const int&] Take account of one out of every rate rays of
- * the input scans
- * @return void
- */
-  void
-CBGL::undersampleLDPScans(
-  LDP& world_scan,
-  LDP& map_scan,
-  const int& rate)
-{
-  undersampleLDPScan(world_scan, rate);
-  undersampleLDPScan(map_scan, rate);
+  return p;
 }
 
 
