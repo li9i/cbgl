@@ -11,21 +11,19 @@
   <arg name="map_resolution"          value="0.05"                if="$(eval gazebo_world == 'fmt_dirtrack')" />
   <arg name="map_directory"           value="$(find relief_devel)/maps" />
 
-  <!-- Launch node pipeline_localiser_node -->
+  <!-- CBGL -->
   <node pkg="cbgl" type="cbgl_node" name="cbgl_node" output="screen">
 
     <!-- General params -->
-    <rosparam command="load" file="$(find cbgl_ros)/configuration_files/pipeline_general.yaml" />
+    <rosparam command="load" file="$(find cbgl)/configuration_files/params_cbgl.yaml" />
 
     <!-- CSM parameters -->
-    <rosparam command="load" file="$(find cbgl_ros)/configuration_files/pipeline_csm.yaml" />
-
-    <!-- ICP parameters -->
-    <rosparam command="load" file="$(find cbgl_ros)/configuration_files/pipeline_icp.yaml" />
+    <rosparam command="load" file="$(find cbgl)/configuration_files/pipeline_csm.yaml" />
 
     <!-- FSM parameters -->
-    <rosparam command="load" file="$(find cbgl_ros)/configuration_files/params_fsm.yaml" />
+    <rosparam command="load" file="$(find cbgl)/configuration_files/params_fsm.yaml" />
 
+    <!-- The map should be transformed to .png file for purposes of raycasting -->
     <param name="map_png_file"        value="$(arg map_directory)/$(arg gazebo_world)_$(arg map_resolution).png" />
 
     <param name="scan_topic"          value="scan"                        if="$(eval robot_type == 'turtlebot')" />

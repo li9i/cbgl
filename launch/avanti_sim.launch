@@ -13,8 +13,6 @@
   <arg name="do_viz"        default="true" />
 
 
-
-
   <!-- launch world, robot, etc -->
   <include file="$(find relief_devel)/launch/avanti_simulation.launch">
     <arg name="gazebo_world"  value="$(arg gazebo_world)" />
@@ -22,7 +20,7 @@
     <arg name="robot_type"    value="$(arg robot_type)" />
     <arg name="do_viz"        value="$(arg do_viz)" />
     <arg name="num_cameras"   value="1" />
-    <arg name="loc_alg"       value="amcl" />
+    <arg name="loc_alg"       value="none" />
   </include>
 
 

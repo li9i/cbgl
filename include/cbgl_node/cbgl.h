@@ -46,6 +46,7 @@
 #include <cmath>
 #include <iostream>
 #include <time.h>
+#include <limits.h>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -99,17 +100,15 @@ class CBGL
     // subscribers
     ros::Subscriber scan_subscriber_;
     ros::Subscriber map_subscriber_;
-    ros::Subscriber pose_subscriber_;
     ros::Subscriber pose_cloud_subscriber_;
     ros::Subscriber odom_subscriber_;
     ros::Subscriber ground_truth_subscriber_;
 
     // services
-    ros::ServiceServer start_signal_service_;
+    ros::ServiceServer global_localisation_service_;
 
     tf::TransformListener tf_listener_;
     tf::TransformBroadcaster tf_broadcaster_;
-
     tf::StampedTransform map_to_base_tf_;
 
     // static, cached
@@ -119,7 +118,6 @@ class CBGL
     tf::Transform laser_to_base_;
 
     // publishers
-    ros::Publisher feedback_pose_publisher_;
     ros::Publisher global_pose_publisher_;
     ros::Publisher execution_time_publisher_;
     ros::Publisher best_particle_publisher_;
@@ -128,26 +126,21 @@ class CBGL
     ros::Publisher top_caer_hypotheses_publisher_ ;
     ros::Publisher world_scan_publisher_;
     ros::Publisher map_scan_publisher_;
-    ros::Publisher map_scan_corrected_publisher_;
     ros::Publisher status_publisher_;
 
     // **** parameters
 
-    std::string base_frame_;
-    std::string fixed_frame_;
-    std::string odom_frame_;
+    std::string base_frame_id_;
+    std::string fixed_frame_id_;
+    std::string odom_frame_id_;
+    bool tf_broadcast_;
 
     std::string scan_topic_;
     std::string map_topic_;
-    std::string odom_topic_;
-    std::string input_pose_topic_;
-    std::string input_pose_cloud_topic_;
-    std::string global_localisation_service_;
-    std::string start_signal_service_name_;
+    std::string output_pose_topic_;
+    std::string global_localisation_service_name_;
 
     std::string laser_z_orientation_;
-
-    unsigned int num_calls_global_localisation_;
 
     // cache a scan's number of rays
     unsigned int nrays_;
@@ -175,7 +168,7 @@ class CBGL
     int icp_iterations_;
     bool icp_incorporate_orientation_only_;
     bool icp_provide_initial_guess_;
-    std::string icp_map_scan_method_;
+    std::string map_scan_method_;
     bool icp_do_fill_map_scan_;
     int icp_scan_undersample_rate_;
     bool icp_do_clip_scans_;
@@ -249,9 +242,17 @@ class CBGL
 
     std::vector<geometry_msgs::Pose::Ptr> dispersed_particles_;
 
-    int top_x_caers_;
+    int dl_;
+    int da_;
+    int top_k_caers_;
 
     // **** methods
+
+    /*****************************************************************************
+     * @brief Broadcasts the estimated pose as the odom<--map transform
+     */
+    void broadcast_global_pose_tf(
+      const geometry_msgs::Pose& pose);
 
     /*****************************************************************************
      */
@@ -265,15 +266,6 @@ class CBGL
      */
     void cacheFFTW3Plans(const unsigned int& sz);
 
-    /*****************************************************************************
-     * @brief This function provides the amcl algorithm with a corrected pose so
-     * as to either (a) initialise itself with it, or (b) introduce the pipeline
-     * result as a new particle.
-     * @param[in] pose [const geometry_msgs::Pose&] The pose
-     * to feed to the amcl
-     * @return void
-     */
-    void closeLoop(const geometry_msgs::PoseWithCovarianceStamped& pose);
 
     /*****************************************************************************
      * @brief Convert an OccupancyGrid map message into the internal
@@ -337,23 +329,6 @@ class CBGL
      */
     void createTfFromXYTheta(const double& x, const double& y,
       const double& theta, tf::Transform& t);
-
-    /*****************************************************************************
-     * @brief The map scan is published through this function, as a means of
-     * visual debug
-     * @param[in] amcl_pose [const geometry_msgs::Pose::Ptr]
-     * The pose of the robot.
-     * @param[in] world_scan [const sensor_msgs::LaserScan::Ptr&] The world scan
-     * @param[in] map_scan [const sensor_msgs::LaserScan::Ptr&] The map scan
-     * @param[in] world_scan_ldp [const LDP&] The world scan in LDP form
-     * @param[in] map_scan_ldp [const LDP&] The map scan in LDP form
-     * @return void
-     */
-    void debugICP(const geometry_msgs::Pose::Ptr pose,
-      const sensor_msgs::LaserScan::Ptr& world_scan,
-      const sensor_msgs::LaserScan::Ptr& map_scan,
-      const LDP& world_scan_ldp,
-      const LDP& map_scan_ldp);
 
     /*****************************************************************************
      * @brief Given the amcl pose and a world scan, this function corrects
@@ -498,16 +473,6 @@ class CBGL
      */
     int numRaysFromAngleRange(const double& angle_min, const double& angle_max,
       const int& num_rays, const double& new_range);
-
-    /*****************************************************************************
-     * @brief the amcl pose callback. this is the point of entry to the pipeline
-     * operation
-     * @param[in] pose_msg [const geometry_msgs::PoseWithCovarianceStamped::Ptr&]
-     * the amcl pose wrt to the map frame
-     * @return void
-     */
-    void poseCallback(
-      const geometry_msgs::PoseWithCovarianceStamped::Ptr& pose_msg);
 
     /*******************************************************************************
      * @brief The amcl cloud pose callback. This is the point of entry
