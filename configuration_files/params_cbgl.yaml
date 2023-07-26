@@ -13,7 +13,7 @@ output_pose_topic: "/initialpose"
 global_localisation_service_name: "/global_localization"
 
 # Locational density in poses per sqm
-dl: 15
+dl: 40
 
 # Angular density in poses per cycle
 da: 32

@@ -153,13 +153,6 @@ CBGL::CBGL(
   // Re-set the map png file
   omap_ = ranges::OMap(map_png_file_);
 
-
-
-  // Publish not busy status
-  std_msgs::UInt64 not_busy_m;
-  not_busy_m.data = 0;
-  status_publisher_.publish(not_busy_m);
-
   ROS_INFO("[CBGL] READY");
 }
 
@@ -1064,9 +1057,9 @@ CBGL::initParams()
   assert(ip_.xy_bound >= 0.0);
   assert(ip_.t_bound >= 0.0);
   assert(ip_.max_counter > 0);
-  assert(ip_.min_magnification_size >= 0);
+  //assert(ip_.min_magnification_size >= 0);
   assert(ip_.max_magnification_size >= ip_.min_magnification_size);
-  assert(ip_.max_recoveries >= 0);
+  //assert(ip_.max_recoveries >= 0);
 }
 
 
@@ -1360,10 +1353,12 @@ CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
 
 
   // The set of hypotheses
-  pf_hyp_ = pf_alloc(min_particles_, max_particles_,
-    0.01, 0.1,
-    (pf_init_model_fn_t)CBGL::uniformPoseGenerator,
-    (void *)map_hyp_);
+  pf_hyp_ = pf_alloc(min_particles_, max_particles_, 0.001, 0.1,
+    (pf_init_model_fn_t)CBGL::uniformPoseGenerator, (void *)map_hyp_);
+  pf_hyp_->pop_err = 0.01;
+  pf_hyp_->pop_z = 0.99;
+
+  pf_init(pf_hyp_, pf_vector_zero(), pf_matrix_zero());
 
   map_ = map_msg;
   map_res_ = map_.info.resolution;
@@ -1490,18 +1485,13 @@ void CBGL::processPoseCloud()
 
   // Construct the 3rd-party ray-casters AFTER both a scan and the map is
   // received
-  bool cond = received_scan_          &&
-    received_pose_cloud_    &&
-    received_start_signal_  &&
-    received_map_;
+  bool cond = received_scan_         &&
+              received_pose_cloud_   &&
+              received_start_signal_ &&
+              received_map_;
 
   if (!cond)
     return;
-
-  // Publish busy status
-  std_msgs::UInt64 busy_m;
-  busy_m.data = 127;
-  status_publisher_.publish(busy_m);
 
   initRangeLibRayCasters();
 
@@ -1635,11 +1625,6 @@ void CBGL::processPoseCloud()
 
   // Re-close down
   received_start_signal_ = false;
-
-  // Publish not busy status
-  std_msgs::UInt64 not_busy_m;
-  not_busy_m.data = 0;
-  status_publisher_.publish(not_busy_m);
 
   num_poses_processed_++;
 }
@@ -2057,7 +2042,7 @@ CBGL::siftThroughCAER(
   if (c != 0.0)
   caers.push_back(c);
   else
-  caers.push_back(std::numeric_limits<unsigned int>::max().0);
+  caers.push_back(std::numeric_limits<double>::max().0);
 
   sv_i.reset();
 
@@ -2157,11 +2142,22 @@ CBGL::siftThroughCAERPanoramic(
       if (c > 0.0)
         caers.push_back(c);
       else // THIS IS NECESSARY
-        caers.push_back(std::numeric_limits<unsigned int>::max());
+        caers.push_back(std::numeric_limits<double>::max());
 
       //printf("%f\n", caers.back());
     }
   }
+
+
+  /*
+  for (unsigned int i = 0; i < all_hypotheses.size(); i++)
+  {
+    ROS_ERROR("(%f,%f,%f)",
+      all_hypotheses[i]->position.x,
+      all_hypotheses[i]->position.y,
+      extractYawFromPose(*all_hypotheses[i]));
+  }
+  */
 
   /*
   // Publish ALL CAERS
@@ -2227,7 +2223,7 @@ CBGL::startSignalService(
   geometry_msgs::PoseArray::Ptr pose_cloud_msg =
     boost::make_shared<geometry_msgs::PoseArray>();
   pose_cloud_msg->header.stamp = ros::Time::now();
-  pose_cloud_msg->header.frame_id = "/map";
+  pose_cloud_msg->header.frame_id = fixed_frame_id_;
   pose_cloud_msg->poses.resize(set->sample_count);
 
   for(int i = 0; i < set->sample_count; i++)
@@ -2240,13 +2236,19 @@ CBGL::startSignalService(
     q.setRPY(0, 0, set->samples[i].pose.v[2]);
     q.normalize();
     tf::quaternionTFToMsg(q, pose_cloud_msg->poses[i].orientation);
+
+    //ROS_ERROR("(%f,%f)",
+    //pose_cloud_msg->poses[i].position.x,
+    //pose_cloud_msg->poses[i].position.y);
   }
 
+  // Publish the cloud. This is not the full cloud considered by CBGL; it only
+  // features dl * area poses at this point. The next step here is to rotate
+  // all of them in 360 / da deg intervals in order to cover a whole cycle ...
   all_hypotheses_publisher_.publish(*pose_cloud_msg);
 
-
+  // ... which is handled here
   poseCloudCallback(pose_cloud_msg);
-
 
   ROS_INFO("[CBGL] Global initialisation done!");
 
