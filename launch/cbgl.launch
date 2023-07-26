@@ -1,0 +1,41 @@
+<launch>
+
+  <arg name="robot_type" />
+  <arg name="gazebo_world" />
+
+  <arg name="map_resolution"          value="0.01"                if="$(eval gazebo_world == 'csal_gl_2023_rb1')" />
+  <arg name="map_resolution"          value="0.01"                if="$(eval gazebo_world == 'fmt_corridor')" />
+  <arg name="map_resolution"          value="0.01"                if="$(eval gazebo_world == 'fmt_home_karto3')" />
+  <arg name="map_resolution"          value="0.01"                if="$(eval gazebo_world == 'fmt_warehouse_karto')" />
+  <arg name="map_resolution"          value="0.05"                if="$(eval gazebo_world == 'fmt_willowgarage')" />
+  <arg name="map_resolution"          value="0.05"                if="$(eval gazebo_world == 'fmt_dirtrack')" />
+  <arg name="map_directory"           value="$(find relief_devel)/maps" />
+
+  <!-- Launch node pipeline_localiser_node -->
+  <node pkg="cbgl" type="cbgl_node" name="cbgl_node" output="screen">
+
+    <!-- General params -->
+    <rosparam command="load" file="$(find cbgl_ros)/configuration_files/pipeline_general.yaml" />
+
+    <!-- CSM parameters -->
+    <rosparam command="load" file="$(find cbgl_ros)/configuration_files/pipeline_csm.yaml" />
+
+    <!-- ICP parameters -->
+    <rosparam command="load" file="$(find cbgl_ros)/configuration_files/pipeline_icp.yaml" />
+
+    <!-- FSM parameters -->
+    <rosparam command="load" file="$(find cbgl_ros)/configuration_files/params_fsm.yaml" />
+
+    <param name="map_png_file"        value="$(arg map_directory)/$(arg gazebo_world)_$(arg map_resolution).png" />
+
+    <param name="scan_topic"          value="scan"                        if="$(eval robot_type == 'turtlebot')" />
+    <param name="odom_topic"          value="odom"                        if="$(eval robot_type == 'turtlebot')" />
+    <param name="laser_z_orientation" value="upwards"                     if="$(eval robot_type == 'turtlebot')" />
+
+    <param name="scan_topic"          value="front_laser/scan"            if="$(eval robot_type == 'rb1')" />
+    <param name="odom_topic"          value="robotnik_base_control/odom"  if="$(eval robot_type == 'rb1')" />
+    <param name="laser_z_orientation" value="downwards"                   if="$(eval robot_type == 'rb1')" />
+
+  </node>
+
+</launch>

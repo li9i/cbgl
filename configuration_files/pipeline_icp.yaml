@@ -1,0 +1,9 @@
+# Params regarding debugging
+icp_visual_debug: false
+icp_do_publish_scans: false
+
+# Selection of the ray-cast method: {vanilla|ray_marching|cddt|bresenham}
+icp_map_scan_method: "ray_marching"
+
+# Undersample scans in order to eliminate unwanted noise effects
+icp_scan_undersample_rate: 1
