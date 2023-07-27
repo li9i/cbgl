@@ -28,6 +28,9 @@ publish_pose_sets: true
 # Selection of the raycasting method: {vanilla|ray_marching|cddt|bresenham}
 map_scan_method: "ray_marching"
 
+# z axis points {upwards|downwards}
+laser_z_orientation: "upwards"
+
 # global pose retrieval method (do_icp AND do_fmt should equal FALSE)
 do_icp: false
 do_fsm: true
