@@ -1,6 +1,6 @@
 # CBGL
 
-https://i.imgur.com/7Ko3Vx0.mp4
+<video src='https://i.imgur.com/7Ko3Vx0.mp4'/>
 
 ## Dependencies
 
