@@ -63,6 +63,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_datatypes.h>
@@ -212,7 +213,6 @@ class CBGL
     bool running_;
     int received_both_scan_and_map_;
     bool received_start_signal_;
-    int num_poses_processed_;
 
     // fixed-to-base tf (pose of base frame in fixed frame)
     tf::Transform f2b_;
@@ -245,6 +245,7 @@ class CBGL
     int dl_;
     int da_;
     int top_k_caers_;
+    bool publish_pose_sets_;
 
     // **** methods
 
@@ -311,14 +312,6 @@ class CBGL
      */
     void correctICPPose(geometry_msgs::Pose::Ptr& icp_corrected_pose,
       const tf::Transform& f2b);
-
-    /*****************************************************************************
-     * @brief Creates a cache for access to values of sin and cos for all values
-     * in [scan_msg->angle_min, can_msg->angle_max].
-     * @param[in] scan_msg [const sensor_msgs::LaserScan::Ptr&] A scan
-     * @return void
-     */
-    void createCache (const sensor_msgs::LaserScan::Ptr& scan_msg);
 
     /*****************************************************************************
      * @brief Creates a transform from a 2D pose (x,y,theta)

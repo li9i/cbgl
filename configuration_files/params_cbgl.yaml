@@ -13,7 +13,7 @@ output_pose_topic: "/initialpose"
 global_localisation_service_name: "/global_localization"
 
 # Locational density in poses per sqm
-dl: 40
+dl: 15
 
 # Angular density in poses per cycle
 da: 32
@@ -22,9 +22,12 @@ da: 32
 # to the measurement range scan
 top_k_caers: 10
 
+# Publish H,H_1,H_2
+publish_pose_sets: false
+
 # Selection of the raycasting method: {vanilla|ray_marching|cddt|bresenham}
 map_scan_method: "ray_marching"
 
 # global pose retrieval method (do_icp AND do_fmt should equal FALSE)
-do_icp: true
-do_fsm: false
+do_icp: false
+do_fsm: true

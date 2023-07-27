@@ -65,7 +65,6 @@ CBGL::CBGL(
   br_(ranges::BresenhamsLine(omap_, 1)),
   pf_hyp_(NULL),
   map_hyp_(NULL),
-  num_poses_processed_(0),
   nrays_(0),
   sgn_(0),
   angle_min_(0.0),
@@ -75,23 +74,8 @@ CBGL::CBGL(
   top_k_caers_(10),
   ground_truths_latest_received_time_ (ros::Time::now())
 {
-  ROS_INFO("[CBGL] Starting CBGL");
-
   // **** init parameters
   initParams();
-
-
-  // **** state variables
-
-  f2b_.setIdentity();
-  input_.laser[0] = 0.0;
-  input_.laser[1] = 0.0;
-  input_.laser[2] = 0.0;
-
-  // Initialize output_ vectors as Null for error-checking
-  output_.cov_x_m = 0;
-  output_.dx_dy1_m = 0;
-  output_.dx_dy2_m = 0;
 
   // **** publishers
 
@@ -153,7 +137,7 @@ CBGL::CBGL(
   // Re-set the map png file
   omap_ = ranges::OMap(map_png_file_);
 
-  ROS_INFO("[CBGL] READY");
+  ROS_INFO("[CBGL] BORN READY");
 }
 
 
@@ -173,6 +157,38 @@ CBGL::~CBGL()
 void CBGL::broadcast_global_pose_tf(
   const geometry_msgs::Pose& pose)
 {
+  // (base --> map) = (base --> odom) x (odom --> map)
+  // therefore
+  // (odom --> map) = (odom --> base) x (base --> map)
+  //----------------------------------------------------------------------------
+  // base <-- odom
+  ros::Time t = ros::Time::now();
+  tf::StampedTransform odom_to_base_tf;
+  try
+  {
+    tf_listener_.waitForTransform(base_frame_id_, odom_frame_id_,
+      t, ros::Duration(1.0));
+    tf_listener_.lookupTransform (base_frame_id_, odom_frame_id_,
+      t, odom_to_base_tf);
+  }
+  catch (tf::TransformException ex)
+  {
+    ROS_WARN("[CBGL] Could not get transform from %s to %s. Error: %s",
+      odom_frame_id_.c_str(), base_frame_id_.c_str(), ex.what());
+  }
+
+  //----------------------------------------------------------------------------
+  // map <-- base
+  tf::Transform base_to_map_tf;
+  createTfFromXYTheta(pose.position.x, pose.position.y, extractYawFromPose(pose),
+    base_to_map_tf);
+
+  //----------------------------------------------------------------------------
+  // (odom --> map)
+  tf::Transform odom_to_map_tf = base_to_map_tf * odom_to_base_tf;
+  tf_broadcaster_.sendTransform(
+    tf::StampedTransform(odom_to_map_tf, ros::Time::now(),
+      fixed_frame_id_, odom_frame_id_));
 }
 
 
@@ -375,33 +391,6 @@ CBGL::correctICPPose(
 
 
 /*******************************************************************************
- * @brief Creates a cache for access to values of sin and cos for all values
- * in [scan_msg->angle_min, can_msg->angle_max].
- * @param[in] scan_msg [const sensor_msgs::LaserScan::Ptr&] A scan
- * @return void
- */
-  void
-CBGL::createCache(const sensor_msgs::LaserScan::Ptr& scan_msg)
-{
-  a_cos_.clear();
-  a_sin_.clear();
-
-  double angle_min = scan_msg->angle_min;
-  double angle_inc = scan_msg->angle_increment;
-
-  for (unsigned int i = 0; i < nrays_; ++i)
-  {
-    double angle = angle_min + i * angle_inc;
-    a_cos_.push_back(cos(angle));
-    a_sin_.push_back(sin(angle));
-  }
-
-  input_.min_reading = scan_msg->range_min;
-  input_.max_reading = scan_msg->range_max;
-}
-
-
-/*******************************************************************************
  * @brief Creates a transform from a 2D pose (x,y,theta)
  * @param[in] x [const double&] The x-wise coordinate of the pose
  * @param[in] y [const double&] The y-wise coordinate of the pose
@@ -470,6 +459,7 @@ CBGL::doFSM(
   // ---------------------------------------------------------------------------
   // Do your magic thing
   FSM::Match::fmtdbh(sr, origin, vp, r2rp_, c2rp_, ip_, &op, &diff);
+  // ---------------------------------------------------------------------------
 
   double dx = std::get<0>(diff);
   double dy = std::get<1>(diff);
@@ -482,6 +472,9 @@ CBGL::doFSM(
   // the correction of the base's position, in the base frame
   f2b_ = base_to_laser_ * corr_ch_l * laser_to_base_;
   *f2b = f2b_;
+  output->x[0] = dx;
+  output->x[1] = dy;
+  output->x[2] = dt;
   output->valid = 1;
 
   // Delete the map scan ptr and the LDPs
@@ -716,7 +709,7 @@ CBGL::handleInputPose(const geometry_msgs::Pose::Ptr& pose_msg,
   // Return if the pose received from amcl contains nan's
   if (nanInPose(pose_msg))
   {
-    ROS_ERROR("[CBGL] amcl pose contains nan's; aborting ...");
+    ROS_ERROR("[CBGL] pose contains nan's; aborting ...");
     return;
   }
 
@@ -807,7 +800,16 @@ CBGL::initParams()
     top_k_caers_ = 10;
     ROS_ERROR("[CBGL] top_k_caers");
   }
-
+  if (!nh_private_.getParam("map_scan_method", map_scan_method_))
+  {
+    map_scan_method_ = "vanilla";
+    ROS_ERROR("[CBGL] map_scan_method");
+  }
+  if (!nh_private_.getParam("publish_pose_sets", publish_pose_sets_))
+  {
+    publish_pose_sets_ = false;
+    ROS_ERROR("[CBGL] publish_pose_sets");
+  }
   if (!nh_private_.getParam("global_localisation_service_name",
       global_localisation_service_name_))
   {
@@ -1135,6 +1137,17 @@ CBGL::initParams()
   else
     ip_.max_recoveries = static_cast<unsigned int>(int_param);
 
+  // **** state variables
+  f2b_.setIdentity();
+  input_.laser[0] = 0.0;
+  input_.laser[1] = 0.0;
+  input_.laser[2] = 0.0;
+
+  // Initialize output_ vectors as Null for error-checking
+  output_.cov_x_m = 0;
+  output_.dx_dy1_m = 0;
+  output_.dx_dy2_m = 0;
+
   assert(ip_.num_iterations > 0);
   assert(ip_.xy_bound >= 0.0);
   assert(ip_.t_bound >= 0.0);
@@ -1430,8 +1443,8 @@ CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
   double area = freeArea(map_hyp_);
 
   // TODO make these depend on the map's area
-  unsigned int min_particles_ = 30000; //dl_ * area;
-  unsigned int max_particles_ = 30000; //dl_ * area;
+  unsigned int min_particles_ = dl_ * area;
+  unsigned int max_particles_ = dl_ * area;
 
 
   // The set of hypotheses
@@ -1447,7 +1460,6 @@ CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
   map_hgt_ = map_.info.height;
 
   received_map_ = true;
-
   if (received_scan_ && received_pose_cloud_ && received_start_signal_)
     processPoseCloud();
 }
@@ -1532,8 +1544,6 @@ CBGL::numRaysFromAngleRange(
 CBGL::poseCloudCallback(
   const geometry_msgs::PoseArray::Ptr& pose_cloud_msg)
 {
-  received_pose_cloud_ = true;
-
   // Store all the filter's particles
   dispersed_particles_.clear();
 
@@ -1546,12 +1556,11 @@ CBGL::poseCloudCallback(
     dispersed_particles_.push_back(pose_i);
   }
 
-
-  ROS_INFO("[CBGL] There are %zu particles in total",
-    dispersed_particles_.size());
-
+  ROS_INFO("[CBGL] There are %zux%d particles in total",
+    dispersed_particles_.size(), da_);
 
   // Process cloud if all other conditions are satisfied
+  received_pose_cloud_ = true;
   if (received_scan_ && received_map_ && received_start_signal_)
     processPoseCloud();
 }
@@ -1575,16 +1584,21 @@ void CBGL::processPoseCloud()
   if (!cond)
     return;
 
+  // Init raycasters with laser details
   initRangeLibRayCasters();
 
+
   // Publish all hypotheses
-  geometry_msgs::PoseArray pa1;
-  pa1.header.stamp = ros::Time::now();
-  std::vector<geometry_msgs::Pose> pv1;
-  for (unsigned int i = 0; i < dispersed_particles_.size(); i++)
-    pv1.push_back(*dispersed_particles_[i]);
-  pa1.poses = pv1;
-  all_hypotheses_publisher_.publish(pa1);
+  if (publish_pose_sets_)
+  {
+    geometry_msgs::PoseArray pa1;
+    pa1.header.stamp = ros::Time::now();
+    std::vector<geometry_msgs::Pose> pv1;
+    for (unsigned int i = 0; i < dispersed_particles_.size(); i++)
+      pv1.push_back(*dispersed_particles_[i]);
+    pa1.poses = pv1;
+    all_hypotheses_publisher_.publish(pa1);
+  }
 
   //----------------------------------------------------------------------------
   // Do not take ALL hypotheses, but only those with the 10 best caers
@@ -1595,13 +1609,16 @@ void CBGL::processPoseCloud()
     caer_best_particles.size());
 
   // Publish top caer hypotheses
-  geometry_msgs::PoseArray pa2;
-  pa2.header.stamp = ros::Time::now();
-  std::vector<geometry_msgs::Pose> pv2;
-  for (unsigned int i = 0; i < caer_best_particles.size(); i++)
-    pv2.push_back(*caer_best_particles[i]);
-  pa2.poses = pv2;
-  top_caer_hypotheses_publisher_.publish(pa2);
+  if (publish_pose_sets_)
+  {
+    geometry_msgs::PoseArray pa2;
+    pa2.header.stamp = ros::Time::now();
+    std::vector<geometry_msgs::Pose> pv2;
+    for (unsigned int i = 0; i < caer_best_particles.size(); i++)
+      pv2.push_back(*caer_best_particles[i]);
+    pa2.poses = pv2;
+    top_caer_hypotheses_publisher_.publish(pa2);
+  }
   //----------------------------------------------------------------------------
 
 
@@ -1615,8 +1632,8 @@ void CBGL::processPoseCloud()
   for (int i = 0; i < caer_best_particles.size(); i++)
   {
     ROS_INFO(
-      "[CBGL] Processing hypothesis %d: (x,y,t) = (%f,%f,%f)",
-      i, caer_best_particles[i]->position.x,
+      "[CBGL] Processing hypothesis %d: (x,y,t) = (%f,%f,%f)", i,
+      caer_best_particles[i]->position.x,
       caer_best_particles[i]->position.y,
       extractYawFromPose(*caer_best_particles[i]));
 
@@ -1693,12 +1710,12 @@ void CBGL::processPoseCloud()
   global_pose_wcs.header.frame_id = "/map";
   global_pose_publisher_.publish(global_pose_wcs);
 
+  // Broadcast pose as transform
   if (tf_broadcast_)
     broadcast_global_pose_tf(global_pose_wcs.pose.pose);
 
   // Publish the index of the best particle by caer standards
   std_msgs::UInt64 np_msg;
-
   if (outputs[score_idx].valid == 1)
     np_msg.data = score_idx;
   else
@@ -1707,8 +1724,6 @@ void CBGL::processPoseCloud()
 
   // Re-close down
   received_start_signal_ = false;
-
-  num_poses_processed_++;
 }
 
 
@@ -1828,12 +1843,11 @@ CBGL::scanCallback(
     if (!std::isfinite(scan_msg->ranges[0])) // premature scan
       return;
 
-
     nrays_ = scan_msg->ranges.size();
     angle_inc_ = scan_msg->angle_increment;
     angle_min_ = scan_msg->angle_min;
-
-    createCache(scan_msg);    // caches the sin and cos of all angles
+    input_.min_reading = scan_msg->range_min;
+    input_.max_reading = scan_msg->range_max;
 
     // cache the static tf from base to laser
     if (!getBaseToLaserTf(scan_msg->header.frame_id))
@@ -1858,8 +1872,6 @@ CBGL::scanCallback(
       latest_world_scan_->ranges[i] = 0;
   }
 
-  received_scan_ = true;
-
 
   // What's the lowest range?
   double lates_world_scan_min_range_now =
@@ -1871,6 +1883,7 @@ CBGL::scanCallback(
       latest_world_scan_->range_min);
 
   // COMMENT-OUT IN CASE OF BAG
+  received_scan_ = true;
   if (received_map_ && received_pose_cloud_ && received_start_signal_)
     processPoseCloud();
 }
@@ -1917,8 +1930,8 @@ CBGL::scanMap(
       *laser_scan_info);
   }
   else if (scan_method.compare("ray_marching") == 0 ||
-    scan_method.compare("bresenham") == 0 ||
-    scan_method.compare("cddt") == 0)
+           scan_method.compare("bresenham")    == 0 ||
+           scan_method.compare("cddt")         == 0)
   {
     // Convert laser position to grid coordinates
     float x = current_laser_pose.position.x / map_.info.resolution;
@@ -1966,7 +1979,6 @@ CBGL::scanMap(
     }
     else if (scan_method.compare("cddt") == 0)
     {
-
       for (unsigned int i = 0; i < nrays_; i++)
         map_scan->ranges.push_back(map_.info.resolution *
           cddt_.calc_range(x,y, -a + sgn * (min_a + i * inc_a)));
@@ -2016,8 +2028,8 @@ CBGL::scanMapPanoramic(
       *laser_scan_info);
   }
   else if (scan_method.compare("ray_marching") == 0 ||
-    scan_method.compare("bresenham") == 0 ||
-    scan_method.compare("cddt") == 0)
+           scan_method.compare("bresenham")    == 0 ||
+           scan_method.compare("cddt")         == 0)
   {
     // Convert laser position to grid coordinates
     float x = current_laser_pose.position.x / map_.info.resolution;
@@ -2124,7 +2136,7 @@ CBGL::siftThroughCAER(
   if (c != 0.0)
   caers.push_back(c);
   else
-  caers.push_back(std::numeric_limits<double>::max().0);
+  caers.push_back(std::numeric_limits<double>::max());
 
   sv_i.reset();
 
@@ -2230,7 +2242,6 @@ CBGL::siftThroughCAERPanoramic(
     }
   }
 
-
   /*
   for (unsigned int i = 0; i < all_hypotheses.size(); i=i+da_)
   {
@@ -2294,10 +2305,10 @@ CBGL::startSignalService(
   while(received_start_signal_)
     ros::Duration(0.1).sleep();
 
-  ROS_INFO("[CBGL] Initializing with uniform distribution");
+  ROS_INFO("--------------------------------------------------------------------------");
+  ROS_INFO("[CBGL] Initializing with uniform distribution over map");
   pf_init_model(pf_hyp_, (pf_init_model_fn_t)CBGL::uniformPoseGenerator,
     (void *)map_hyp_);
-
 
   // The set of all newly-distributed hypotheses
   pf_sample_set_t* set = pf_hyp_->sets + pf_hyp_->current_set;
@@ -2327,12 +2338,14 @@ CBGL::startSignalService(
   // Publish the cloud. This is not the full cloud considered by CBGL; it only
   // features dl * area poses at this point. The next step here is to rotate
   // all of them in 360 / da deg intervals in order to cover a whole cycle ...
-  all_hypotheses_publisher_.publish(*pose_cloud_msg);
+  if (publish_pose_sets_)
+    all_hypotheses_publisher_.publish(*pose_cloud_msg);
 
-  // ... which is handled here
+  // ... which is handled here. This used to be a callback and the name stuck.
   poseCloudCallback(pose_cloud_msg);
 
   ROS_INFO("[CBGL] Global initialisation done!");
+  ROS_INFO("----------------------------------");
 
   received_start_signal_ = true;
   return received_start_signal_;

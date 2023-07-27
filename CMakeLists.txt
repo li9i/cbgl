@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(PkgConfig)
 pkg_check_modules(csm REQUIRED csm)
 
+# FSM needs CGAL
 find_package(CGAL REQUIRED)
 
 
@@ -37,10 +38,13 @@ include_directories(include
 
 link_directories(${csm_LIBRARY_DIRS})
 
+# Occupancy grid utils
 add_library(cbgl_og_utils_lib
   src/utils/occupancy_grid_utils/coordinate_conversions.cpp
   src/utils/occupancy_grid_utils/ray_tracer.cpp
 )
+
+# Particle filter utils
 add_library(cbgl_pf_utils_lib
   src/utils/pf/pf.c
   src/utils/pf/pf_kdtree.c
@@ -48,6 +52,8 @@ add_library(cbgl_pf_utils_lib
   src/utils/pf/pf_vector.c
   src/utils/pf/eig3.c
 )
+
+# Map utils from generation of hypotheses
 add_library(cbgl_map_utils_lib
   src/utils/map/map.c
 )
@@ -58,4 +64,5 @@ target_link_libraries(cbgl_og_utils_lib
   ${catkin_LIBRARIES}
 )
 
+# cbgl
 add_subdirectory(src/cbgl_node)

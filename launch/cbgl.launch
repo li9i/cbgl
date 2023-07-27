@@ -3,18 +3,18 @@
   <arg name="robot_type" />
   <arg name="gazebo_world" />
 
-  <arg name="map_resolution"          value="0.01"                if="$(eval gazebo_world == 'csal_gl_2023_rb1')" />
-  <arg name="map_resolution"          value="0.01"                if="$(eval gazebo_world == 'fmt_corridor')" />
-  <arg name="map_resolution"          value="0.01"                if="$(eval gazebo_world == 'fmt_home_karto3')" />
-  <arg name="map_resolution"          value="0.01"                if="$(eval gazebo_world == 'fmt_warehouse_karto')" />
-  <arg name="map_resolution"          value="0.05"                if="$(eval gazebo_world == 'fmt_willowgarage')" />
-  <arg name="map_resolution"          value="0.05"                if="$(eval gazebo_world == 'fmt_dirtrack')" />
-  <arg name="map_directory"           value="$(find relief_devel)/maps" />
+  <arg name="map_directory"   value="$(find relief_devel)/maps" />
+  <arg name="map_resolution"  value="0.01"  if="$(eval gazebo_world == 'csal_gl_2023_rb1')" />
+  <arg name="map_resolution"  value="0.01"  if="$(eval gazebo_world == 'fmt_corridor')" />
+  <arg name="map_resolution"  value="0.01"  if="$(eval gazebo_world == 'fmt_home_karto3')" />
+  <arg name="map_resolution"  value="0.01"  if="$(eval gazebo_world == 'fmt_warehouse_karto')" />
+  <arg name="map_resolution"  value="0.05"  if="$(eval gazebo_world == 'fmt_willowgarage')" />
+  <arg name="map_resolution"  value="0.05"  if="$(eval gazebo_world == 'fmt_dirtrack')" />
 
   <!-- CBGL -->
   <node pkg="cbgl" type="cbgl_node" name="cbgl_node" output="screen">
 
-    <!-- General params -->
+    <!-- General parameters -->
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_cbgl.yaml" />
 
     <!-- CSM parameters -->
