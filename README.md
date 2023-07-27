@@ -1,5 +1,7 @@
 # CBGL
 
+Click on the image for a brief demo
+
 [![CBGL in Willowgarage](https://img.youtube.com/vi/DkKdxFNJG4g/maxresdefault.jpg)](https://youtu.be/DkKdxFNJG4g)
 
 ## Dependencies
