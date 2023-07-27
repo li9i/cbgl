@@ -1,6 +1,7 @@
 <launch>
 
-    <!-- The map should be transformed to .png file for purposes of raycasting -->
+    <!-- The map should be transformed to .png file for purposes of raycasting.
+         `map_png_file` provides the path to the png file -->
   <arg name="map_png_file" />
 
   <!-- CBGL -->

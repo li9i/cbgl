@@ -14,11 +14,14 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 
-# switch to   pkg_check_modules(csm REQUIRED csm)
+# csm for scan--to--map-scan matching when λ < 2π
+# switch to
+# pkg_check_modules(csm REQUIRED csm)
 # if you have a package-manager-installed copy of csm
 find_package(PkgConfig)
 pkg_check_modules(csmc REQUIRED csm)
 
+# FSM for scan--to--map-scan matching when λ = 2π
 # FSM needs CGAL
 find_package(CGAL REQUIRED)
 
