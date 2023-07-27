@@ -1,6 +1,6 @@
 # CBGL
 
-![CBGL in Willowgarage](https://i.imgur.com/7Ko3Vx0.mp4)
+[![CBGL in Willowgarage](https://img.youtube.com/vi/DkKdxFNJG4g/maxresdefault.jpg)](https://youtu.be/DkKdxFNJG4g)
 
 ## Dependencies
 
