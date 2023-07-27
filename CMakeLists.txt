@@ -14,8 +14,10 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 
+# switch to   pkg_check_modules(csm REQUIRED csm)
+# if you have a package-manager-installed copy of csm
 find_package(PkgConfig)
-pkg_check_modules(csm REQUIRED csm)
+pkg_check_modules(csmc REQUIRED csm)
 
 # FSM needs CGAL
 find_package(CGAL REQUIRED)
@@ -63,6 +65,9 @@ target_link_libraries(cbgl_og_utils_lib
   cbgl_map_utils_lib
   ${catkin_LIBRARIES}
 )
+
+# csm
+add_subdirectory(src/utils/csmc)
 
 # cbgl
 add_subdirectory(src/cbgl_node)

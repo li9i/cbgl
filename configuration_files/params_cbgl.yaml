@@ -23,7 +23,7 @@ da: 32
 top_k_caers: 10
 
 # Publish H,H_1,H_2
-publish_pose_sets: false
+publish_pose_sets: true
 
 # Selection of the raycasting method: {vanilla|ray_marching|cddt|bresenham}
 map_scan_method: "ray_marching"
