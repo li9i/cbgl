@@ -18,7 +18,7 @@
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_cbgl.yaml" />
 
     <!-- CSM parameters -->
-    <rosparam command="load" file="$(find cbgl)/configuration_files/pipeline_csm.yaml" />
+    <rosparam command="load" file="$(find cbgl)/configuration_files/params_csm.yaml" />
 
     <!-- FSM parameters -->
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_fsm.yaml" />

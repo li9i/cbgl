@@ -4,13 +4,13 @@
   <!--arg name="gazebo_world"  default="fmt_warehouse_karto" /-->
 
   <!-- true | false -->
-  <arg name="gazebo_gui"    default="true" />
+  <arg name="gazebo_gui"    default="false" />
 
   <!-- turtlebot | rb1-->
   <arg name="robot_type"    default="turtlebot" />
 
   <!-- visualisation is not necessarily necessary -->
-  <arg name="do_viz"        default="true" />
+  <arg name="do_viz"        default="false" />
 
 
   <!-- launch world, robot, etc -->

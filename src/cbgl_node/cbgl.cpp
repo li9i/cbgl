@@ -758,31 +758,67 @@ CBGL::handleInputPose(const geometry_msgs::Pose::Ptr& pose_msg,
 CBGL::initParams()
 {
   if (!nh_private_.getParam("base_frame_id", base_frame_id_))
+  {
     base_frame_id_ = "base_footprint";
+    ROS_ERROR("[CBGL] base_frame_id");
+  }
   if (!nh_private_.getParam("fixed_frame_id", fixed_frame_id_))
+  {
     fixed_frame_id_ = "map";
+    ROS_ERROR("[CBGL] fixed_frame_id");
+  }
   if (!nh_private_.getParam("odom_frame_id", odom_frame_id_))
+  {
     odom_frame_id_ = "odom";
+    ROS_ERROR("[CBGL] odom_frame_id");
+  }
   if (!nh_private_.getParam("tf_broadcast", tf_broadcast_))
+  {
     tf_broadcast_ = false;
+    ROS_ERROR("[CBGL] tf_broadcast");
+  }
   if (!nh_private_.getParam("scan_topic", scan_topic_))
+  {
     scan_topic_ = "/front_laser/scan";
+    ROS_ERROR("[CBGL] scan_topic");
+  }
   if (!nh_private_.getParam("map_topic", map_topic_))
+  {
     map_topic_ = "/map";
+    ROS_ERROR("[CBGL] map_topic");
+  }
   if (!nh_private_.getParam("output_pose_topic", output_pose_topic_))
+  {
     output_pose_topic_ = "/initialpose";
+    ROS_ERROR("[CBGL] output_pose_topic");
+  }
   if (!nh_private_.getParam("dl", dl_))
+  {
     dl_ = 40;
+    ROS_ERROR("[CBGL] param dl");
+  }
   if (!nh_private_.getParam("da", da_))
+  {
     da_ = 32;
+    ROS_ERROR("[CBGL] param da");
+  }
   if (!nh_private_.getParam("top_k_caers", top_k_caers_))
+  {
     top_k_caers_ = 10;
+    ROS_ERROR("[CBGL] top_k_caers");
+  }
 
   if (!nh_private_.getParam("global_localisation_service_name",
       global_localisation_service_name_))
+  {
     global_localisation_service_name_ = "/global_localization";
+    ROS_ERROR("[CBGL] global_localisation_service_name");
+  }
   if (!nh_private_.getParam("laser_z_orientation", laser_z_orientation_))
+  {
     laser_z_orientation_ = "upwards";
+    ROS_ERROR("[CBGL] laser_z_orientation");
+  }
 
   // The angular progression of scanning depends on how the laser is mounted
   // on the robot:
@@ -798,95 +834,135 @@ CBGL::initParams()
     ROS_ERROR("       for param laser_z_orientation");
   }
 
-  // **** How to publish the output?
-  // tf (fixed_frame->base_frame),
-  // pose message (pose of base frame in the fixed frame)
 
-  if (!nh_private_.getParam("position_covariance", position_covariance_))
-  {
-    position_covariance_.resize(3);
-    std::fill(position_covariance_.begin(), position_covariance_.end(), 1e-9);
-  }
-
-  if (!nh_private_.getParam("orientation_covariance", orientation_covariance_))
-  {
-    orientation_covariance_.resize(3);
-    std::fill(orientation_covariance_.begin(), orientation_covariance_.end(), 1e-9);
-  }
   // **** CSM parameters - comments copied from algos.h (by Andrea Censi)
 
   // Maximum angular displacement between scans
   if (!nh_private_.getParam ("max_angular_correction_deg", input_.max_angular_correction_deg))
+  {
     input_.max_angular_correction_deg = 45.0;
+    ROS_ERROR("[CBGL] max_angular_correction_deg");
+  }
 
   // Maximum translation between scans (m)
   if (!nh_private_.getParam ("max_linear_correction", input_.max_linear_correction))
+  {
     input_.max_linear_correction = 0.50;
+    ROS_ERROR("[CBGL] max_linear_correction");
+  }
 
   // Maximum ICP cycle iterations
   if (!nh_private_.getParam ("max_iterations", input_.max_iterations))
+  {
     input_.max_iterations = 10;
+    ROS_ERROR("[CBGL] max_iterations");
+  }
 
   // A threshold for stopping (m)
   if (!nh_private_.getParam ("epsilon_xy", input_.epsilon_xy))
+  {
     input_.epsilon_xy = 0.000001;
+    ROS_ERROR("[CBGL] epsilon_xy");
+  }
 
   // A threshold for stopping (rad)
   if (!nh_private_.getParam ("epsilon_theta", input_.epsilon_theta))
+  {
     input_.epsilon_theta = 0.000001;
+    ROS_ERROR("[CBGL] epsilon_theta");
+  }
 
   // Maximum distance for a correspondence to be valid
   if (!nh_private_.getParam ("max_correspondence_dist", input_.max_correspondence_dist))
+  {
     input_.max_correspondence_dist = 0.3;
+    ROS_ERROR("[CBGL] max_correspondence_dist");
+  }
 
   // Noise in the scan (m)
   if (!nh_private_.getParam ("sigma", input_.sigma))
+  {
     input_.sigma = 0.010;
+    ROS_ERROR("[CBGL] sigma");
+  }
 
   // Use smart tricks for finding correspondences.
   if (!nh_private_.getParam ("use_corr_tricks", input_.use_corr_tricks))
+  {
     input_.use_corr_tricks = 1;
+    ROS_ERROR("[CBGL] use_corr_tricks");
+  }
 
   // Restart: Restart if error is over threshold
   if (!nh_private_.getParam ("restart", input_.restart))
+  {
     input_.restart = 0;
+    ROS_ERROR("[CBGL] restart");
+  }
 
   // Restart: Threshold for restarting
   if (!nh_private_.getParam ("restart_threshold_mean_error", input_.restart_threshold_mean_error))
+  {
     input_.restart_threshold_mean_error = 0.01;
+    ROS_ERROR("[CBGL] restart_threshold_mean_error");
+  }
 
   // Restart: displacement for restarting. (m)
   if (!nh_private_.getParam ("restart_dt", input_.restart_dt))
+  {
     input_.restart_dt = 1.0;
+    ROS_ERROR("[CBGL] restart_dt");
+  }
 
   // Restart: displacement for restarting. (rad)
   if (!nh_private_.getParam ("restart_dtheta", input_.restart_dtheta))
+  {
     input_.restart_dtheta = 0.1;
+    ROS_ERROR("[CBGL] restart_dtheta");
+  }
 
   // Max distance for staying in the same clustering
   if (!nh_private_.getParam ("clustering_threshold", input_.clustering_threshold))
+  {
     input_.clustering_threshold = 0.25;
+    ROS_ERROR("[CBGL] clustering_threshold");
+  }
 
   // Number of neighbour rays used to estimate the orientation
   if (!nh_private_.getParam ("orientation_neighbourhood", input_.orientation_neighbourhood))
+  {
     input_.orientation_neighbourhood = 20;
+    ROS_ERROR("[CBGL] orientation_neighbourhood");
+  }
 
   // If 0, it's vanilla ICP
   if (!nh_private_.getParam ("use_point_to_line_distance", input_.use_point_to_line_distance))
+  {
     input_.use_point_to_line_distance = 1;
+    ROS_ERROR("[CBGL] use_point_to_line_distance");
+  }
 
   // Discard correspondences based on the angles
   if (!nh_private_.getParam ("do_alpha_test", input_.do_alpha_test))
+  {
     input_.do_alpha_test = 0;
+    ROS_ERROR("[CBGL] do_alpha_test");
+  }
 
   // Discard correspondences based on the angles - threshold angle, in degrees
   if (!nh_private_.getParam ("do_alpha_test_thresholdDeg", input_.do_alpha_test_thresholdDeg))
+  {
     input_.do_alpha_test_thresholdDeg = 20.0;
+    ROS_ERROR("[CBGL] do_alpha_test_thresholdDeg");
+  }
 
   // Percentage of correspondences to consider: if 0.9,
   // always discard the top 10% of correspondences with more error
   if (!nh_private_.getParam ("outliers_maxPerc", input_.outliers_maxPerc))
+  {
     input_.outliers_maxPerc = 0.90;
+    ROS_ERROR("[CBGL] outliers_maxPerc");
+  }
 
   // Parameters describing a simple adaptive algorithm for discarding.
   //  1) Order the errors.
@@ -897,46 +973,79 @@ CBGL::initParams()
   //  4) Discard correspondences over the threshold.
   //  This is useful to be conservative; yet remove the biggest errors.
   if (!nh_private_.getParam ("outliers_adaptive_order", input_.outliers_adaptive_order))
+  {
     input_.outliers_adaptive_order = 0.7;
+    ROS_ERROR("[CBGL] outliers_adaptive_order");
+  }
 
   if (!nh_private_.getParam ("outliers_adaptive_mult", input_.outliers_adaptive_mult))
+  {
     input_.outliers_adaptive_mult = 2.0;
+    ROS_ERROR("[CBGL] outliers_adaptive_mult");
+  }
 
   // If you already have a guess of the solution, you can compute the polar angle
   // of the points of one scan in the new position. If the polar angle is not a monotone
   // function of the readings index, it means that the surface is not visible in the
   // next position. If it is not visible, then we don't use it for matching.
   if (!nh_private_.getParam ("do_visibility_test", input_.do_visibility_test))
+  {
     input_.do_visibility_test = 0;
+    ROS_ERROR("[CBGL] do_visibility_test");
+  }
 
   // no two points in laser_sens can have the same corr.
   if (!nh_private_.getParam ("outliers_remove_doubles", input_.outliers_remove_doubles))
+  {
     input_.outliers_remove_doubles = 1;
+    ROS_ERROR("[CBGL] outliers_remove_doubles");
+  }
 
   // If 1, computes the covariance of ICP using the method http://purl.org/censi/2006/icpcov
   if (!nh_private_.getParam ("do_compute_covariance", input_.do_compute_covariance))
+  {
     input_.do_compute_covariance = 0;
+    ROS_ERROR("[CBGL] do_compute_covariance");
+  }
 
   // Checks that find_correspondences_tricks gives the right answer
   if (!nh_private_.getParam ("debug_verify_tricks", input_.debug_verify_tricks))
+  {
     input_.debug_verify_tricks = 0;
+    ROS_ERROR("[CBGL] debug_verify_tricks");
+  }
 
   // If 1, the field 'true_alpha' (or 'alpha') in the first scan is used to compute the
   // incidence beta, and the factor (1/cos^2(beta)) used to weight the correspondence.");
   if (!nh_private_.getParam ("use_ml_weights", input_.use_ml_weights))
+  {
     input_.use_ml_weights = 0;
+    ROS_ERROR("[CBGL] use_ml_weights");
+  }
 
   // If 1, the field 'readings_sigma' in the second scan is used to weight the
   // correspondence by 1/sigma^2
   if (!nh_private_.getParam ("use_sigma_weights", input_.use_sigma_weights))
+  {
     input_.use_sigma_weights = 0;
+    ROS_ERROR("[CBGL] use_sigma_weights");
+  }
 
   if (!nh_private_.getParam ("gpm_theta_bin_size_deg", input_.gpm_theta_bin_size_deg))
+  {
     input_.gpm_theta_bin_size_deg = 5;
+    ROS_ERROR("[CBGL] gpm_theta_bin_size_deg");
+  }
   if (!nh_private_.getParam ("gpm_extend_range_deg", input_.gpm_extend_range_deg))
+  {
     input_.gpm_extend_range_deg = 15;
+    ROS_ERROR("[CBGL] gpm_extend_range_deg");
+  }
   if (!nh_private_.getParam ("gpm_interval", input_.gpm_interval))
+  {
     input_.gpm_interval = 1;
+    ROS_ERROR("[CBGL] gpm_interval");
+  }
 
 
   // *** parameters introduced by us
@@ -949,48 +1058,21 @@ CBGL::initParams()
     initial_cov_aa_ = 0.06854;
 
   if (!nh_private_.getParam("map_png_file", map_png_file_))
+  {
     map_png_file_ = "";
-
-  if (!nh_private_.getParam("feedback_particle_topic", feedback_particle_topic_))
-    feedback_particle_topic_ = "particle_introduction";
-
-  if (!nh_private_.getParam("map_scan_theta_disc", map_scan_theta_disc_))
-    map_scan_theta_disc_ = 720;
-
-  if (!nh_private_.getParam("icp_iterations", icp_iterations_))
-    icp_iterations_ = 1;
-
-  if (!nh_private_.getParam("icp_incorporate_orientation_only", icp_incorporate_orientation_only_))
-    icp_incorporate_orientation_only_ = true;
-
-  if (!nh_private_.getParam("map_scan_method", map_scan_method_))
-    map_scan_method_ = "vanilla";
-
-  if (!nh_private_.getParam("icp_do_clip_scans", icp_do_clip_scans_))
-    icp_do_clip_scans_ = false;
-
-  if (!nh_private_.getParam("icp_clip_sill", icp_clip_sill_))
-    icp_clip_sill_ = 100.0;
-
-  if (!nh_private_.getParam("icp_clip_lintel", icp_clip_lintel_))
-    icp_clip_lintel_ = 0.0;
-
-  if (!nh_private_.getParam("icp_fill_mean_value", icp_fill_mean_value_))
-    icp_fill_mean_value_ = 0.0;
-
-  if (!nh_private_.getParam("icp_fill_std_value", icp_fill_std_value_))
-    icp_fill_std_value_ = 0.01;
-
-  if (!nh_private_.getParam("icp_do_invalidate_diff_rays", icp_do_invalidate_diff_rays_))
-    icp_do_invalidate_diff_rays_ = false;
-
-  if (!nh_private_.getParam("icp_invalidate_diff_rays_epsilon", icp_invalidate_diff_rays_epsilon_))
-    icp_invalidate_diff_rays_epsilon_ = false;
+    ROS_ERROR("[CBGL] map_png_file");
+  }
 
   if (!nh_private_.getParam("do_icp", do_icp_))
+  {
     do_icp_ = true;
+    ROS_ERROR("[CBGL] do_icp");
+  }
   if (!nh_private_.getParam("do_fsm", do_fsm_))
+  {
     do_fsm_ = false;
+    ROS_ERROR("[CBGL] do_fsm");
+  }
 
   // FSM Params
   int int_param;
@@ -1084,7 +1166,7 @@ void CBGL::initRangeLibRayCasters()
     rm_ = ranges::RayMarching(omap_, max_range_rc);
 
   if (map_scan_method_.compare("cddt") == 0)
-    cddt_ = ranges::CDDTCast(omap_, max_range_rc, map_scan_theta_disc_);
+    cddt_ = ranges::CDDTCast(omap_, max_range_rc, 720);
 }
 
 
@@ -1348,8 +1430,8 @@ CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
   double area = freeArea(map_hyp_);
 
   // TODO make these depend on the map's area
-  unsigned int min_particles_ = dl_ * area;
-  unsigned int max_particles_ = dl_ * area;
+  unsigned int min_particles_ = 30000; //dl_ * area;
+  unsigned int max_particles_ = 30000; //dl_ * area;
 
 
   // The set of hypotheses
@@ -2150,9 +2232,9 @@ CBGL::siftThroughCAERPanoramic(
 
 
   /*
-  for (unsigned int i = 0; i < all_hypotheses.size(); i++)
+  for (unsigned int i = 0; i < all_hypotheses.size(); i=i+da_)
   {
-    ROS_ERROR("(%f,%f,%f)",
+    ROS_INFO("(%f,%f,%f)",
       all_hypotheses[i]->position.x,
       all_hypotheses[i]->position.y,
       extractYawFromPose(*all_hypotheses[i]));
