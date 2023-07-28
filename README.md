@@ -1,8 +1,11 @@
 # CBGL
 
-<!-- 
+CBGL is a ROS package that allows you to localise your 2D LIDAR sensor in
+a given 2D metric map under global uncertainty in position and orientation.
+
+<!--
 Click on the image for a brief demo
-[![CBGL in Willowgarage](https://img.youtube.com/vi/DkKdxFNJG4g/maxresdefault.jpg)](https://youtu.be/DkKdxFNJG4g) 
+[![CBGL in Willowgarage](https://img.youtube.com/vi/DkKdxFNJG4g/maxresdefault.jpg)](https://youtu.be/DkKdxFNJG4g)
 -->
 
 
