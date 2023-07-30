@@ -142,6 +142,8 @@ class CBGL
     std::string global_localisation_service_name_;
 
     std::string laser_z_orientation_;
+    bool do_undersample_scan_;
+    int undersample_rate_;
 
     // cache a scan's number of rays
     unsigned int nrays_;

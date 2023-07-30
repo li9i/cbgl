@@ -31,6 +31,13 @@ map_scan_method: "ray_marching"
 # z axis points {upwards|downwards}
 laser_z_orientation: "upwards"
 
+# Undersample number of ranges (CBGL is robust to decreasing number of ranges +
+# reduction in number of ranges means less execution time)
+do_undersample_scan: false
+
+# if undersample_rate = 4 then 1 out of 4 rays are considered
+undersample_rate: 1
+
 # global pose retrieval method (do_icp AND do_fmt should equal FALSE)
 do_icp: false
 do_fsm: true

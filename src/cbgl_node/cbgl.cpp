@@ -821,7 +821,16 @@ CBGL::initParams()
     laser_z_orientation_ = "upwards";
     ROS_ERROR("[CBGL] laser_z_orientation");
   }
-
+  if (!nh_private_.getParam("do_undersample_scan", do_undersample_scan_))
+  {
+    do_undersample_scan_ = false;
+    ROS_ERROR("[CBGL] do_undersample_scan");
+  }
+  if (!nh_private_.getParam("undersample_rate", undersample_rate_))
+  {
+    undersample_rate_ = 1;
+    ROS_ERROR("[CBGL] undersample_rate");
+  }
   // The angular progression of scanning depends on how the laser is mounted
   // on the robot:
   // a. On the turtlebot the laser faces upwards;
@@ -1155,6 +1164,7 @@ CBGL::initParams()
   //assert(ip_.min_magnification_size >= 0);
   assert(ip_.max_magnification_size >= ip_.min_magnification_size);
   //assert(ip_.max_recoveries >= 0);
+  assert(undersample_rate_ >= 0);
 }
 
 
@@ -1836,53 +1846,70 @@ CBGL::retypeScan(const sensor_msgs::LaserScan::Ptr& scan_msg)
 CBGL::scanCallback(
   const sensor_msgs::LaserScan::Ptr& scan_msg)
 {
-  // **** if first scan, cache the tf from base to the scanner
+  if (!std::isfinite(scan_msg->ranges[0])) // premature scan
+    return;
 
+  // Undersample range scan if desirable ---------------------------------------
+  sensor_msgs::LaserScan::Ptr s_ =
+    boost::make_shared<sensor_msgs::LaserScan>(*scan_msg);
+  if (do_undersample_scan_)
+  {
+    std::vector<float> uranges;
+    for (unsigned int i = 0; i < scan_msg->ranges.size(); i++)
+    {
+      if (fmod(i,undersample_rate_) == 0)
+        uranges.push_back(scan_msg->ranges[i]);
+    }
+
+    // The new scan message
+    s_->ranges = uranges;
+    s_->angle_increment = undersample_rate_ * scan_msg->angle_increment;
+  }
+
+  // Store scan properties -----------------------------------------------------
+  nrays_ = s_->ranges.size();
+  angle_inc_ = s_->angle_increment;
+  angle_min_ = s_->angle_min;
+  input_.min_reading = s_->range_min;
+  input_.max_reading = s_->range_max;
+
+
+  // Store the latest scan -----------------------------------------------------
+  latest_world_scan_ =
+    boost::make_shared<sensor_msgs::LaserScan>(*s_);
+
+  for (unsigned int i = 0; i < s_->ranges.size(); i++)
+  {
+    if (!std::isfinite(s_->ranges[i]))
+      latest_world_scan_->ranges[i] = 0;
+  }
+
+
+  // What's the lowest range?
+  double latest_world_scan_min_range_now =
+    *min_element(s_->ranges.begin(), s_->ranges.end());
+
+  // Remove garbage measurements if lowest measured range <= min sensor range
+  if (latest_world_scan_min_range_now <= latest_world_scan_->range_min)
+    latest_world_scan_->ranges = interpolateRanges(latest_world_scan_->ranges,
+      latest_world_scan_->range_min);
+
+
+  // if first scan cache needed stuff ------------------------------------------
   if (!received_scan_)
   {
-    if (!std::isfinite(scan_msg->ranges[0])) // premature scan
-      return;
-
-    nrays_ = scan_msg->ranges.size();
-    angle_inc_ = scan_msg->angle_increment;
-    angle_min_ = scan_msg->angle_min;
-    input_.min_reading = scan_msg->range_min;
-    input_.max_reading = scan_msg->range_max;
-
     // cache the static tf from base to laser
-    if (!getBaseToLaserTf(scan_msg->header.frame_id))
+    if (!getBaseToLaserTf(s_->header.frame_id))
     {
       ROS_WARN("[CBGL] Skipping scan");
       return;
     }
 
     if (do_fsm_)
-      cacheFFTW3Plans(scan_msg->ranges.size());
+      cacheFFTW3Plans(s_->ranges.size());
   }
 
-
-  // Store the latest scan
-  //boost::mutex::scoped_lock lock(mutex_);
-  latest_world_scan_ =
-    boost::make_shared<sensor_msgs::LaserScan>(*scan_msg);
-
-  for (unsigned int i = 0; i < scan_msg->ranges.size(); i++)
-  {
-    if (!std::isfinite(scan_msg->ranges[i]))
-      latest_world_scan_->ranges[i] = 0;
-  }
-
-
-  // What's the lowest range?
-  double lates_world_scan_min_range_now =
-    *min_element(scan_msg->ranges.begin(), scan_msg->ranges.end());
-
-  // Remove garbage measurements if lowest measured range <= min sensor range
-  if (lates_world_scan_min_range_now <= latest_world_scan_->range_min)
-    latest_world_scan_->ranges = interpolateRanges(latest_world_scan_->ranges,
-      latest_world_scan_->range_min);
-
-  // COMMENT-OUT IN CASE OF BAG
+  // Good to go ----------------------------------------------------------------
   received_scan_ = true;
   if (received_map_ && received_pose_cloud_ && received_start_signal_)
     processPoseCloud();
@@ -1930,8 +1957,8 @@ CBGL::scanMap(
       *laser_scan_info);
   }
   else if (scan_method.compare("ray_marching") == 0 ||
-           scan_method.compare("bresenham")    == 0 ||
-           scan_method.compare("cddt")         == 0)
+    scan_method.compare("bresenham")    == 0 ||
+    scan_method.compare("cddt")         == 0)
   {
     // Convert laser position to grid coordinates
     float x = current_laser_pose.position.x / map_.info.resolution;
@@ -2028,8 +2055,8 @@ CBGL::scanMapPanoramic(
       *laser_scan_info);
   }
   else if (scan_method.compare("ray_marching") == 0 ||
-           scan_method.compare("bresenham")    == 0 ||
-           scan_method.compare("cddt")         == 0)
+    scan_method.compare("bresenham")    == 0 ||
+    scan_method.compare("cddt")         == 0)
   {
     // Convert laser position to grid coordinates
     float x = current_laser_pose.position.x / map_.info.resolution;
@@ -2243,14 +2270,14 @@ CBGL::siftThroughCAERPanoramic(
   }
 
   /*
-  for (unsigned int i = 0; i < all_hypotheses.size(); i=i+da_)
-  {
-    ROS_INFO("(%f,%f,%f)",
-      all_hypotheses[i]->position.x,
-      all_hypotheses[i]->position.y,
-      extractYawFromPose(*all_hypotheses[i]));
-  }
-  */
+     for (unsigned int i = 0; i < all_hypotheses.size(); i=i+da_)
+     {
+     ROS_INFO("(%f,%f,%f)",
+     all_hypotheses[i]->position.x,
+     all_hypotheses[i]->position.y,
+     extractYawFromPose(*all_hypotheses[i]));
+     }
+     */
 
   /*
   // Publish ALL CAERS
