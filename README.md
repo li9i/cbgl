@@ -1,6 +1,6 @@
 # CBGL
 
-CBGL is a ROS package that allows you to localise your 2D LIDAR sensor in
+`cbgl` is a ROS package that allows you to localise your 2D LIDAR sensor in
 a given 2D metric map under global uncertainty in position and orientation.
 
 <!--
