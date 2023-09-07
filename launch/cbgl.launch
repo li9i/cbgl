@@ -10,10 +10,10 @@
     <!-- General parameters -->
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_cbgl.yaml" />
 
-    <!-- CSM parameters -->
+    <!-- CSM parameters (when FOV <= 2π) -->
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_csm.yaml" />
 
-    <!-- FSM parameters -->
+    <!-- FSM parameters (when FOV = 2π)-->
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_fsm.yaml" />
 
     <!-- The map should be transformed to .png file for purposes of raycasting -->
