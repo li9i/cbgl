@@ -1,7 +1,7 @@
 # CBGL
 
 `cbgl` is a ROS package that allows you to localise your 2D LIDAR sensor in a
-given 2D metric map under global uncertainty in position and orientation
+given 2D metric map under global uncertainty in position and orientation,
 written in C++.
 
 <!--
@@ -12,7 +12,7 @@ Click on the image for a brief demo
 
 https://github.com/li9i/cbgl/assets/1658819/5794cd21-651d-4924-b453-25c46b9e42a9
 
-## How to install`cbgl`
+## How to install `cbgl`
 
 ### Via traditional means
 
@@ -55,7 +55,7 @@ docker run -it \
 ## How to launch `cbgl`
 
 Before launching your robot, map, etc, you will need to export the map of your
-environment, say `map.pgm`, into a .png file with the same name (`map.png`).
+environment, say `map.pgm`, into a .`png` file with the same name (`map.png`).
 
 ### Via traditional means
 
@@ -84,7 +84,7 @@ rosservice call /global_localization
 If you have used `cbgl` in your research please consider citing the following preprint:
 
 ```bibtex
-@article{9981228,
+@article{cbgl,
   title={CBGL: Fast Monte Carlo Passive Global Localisation of 2D LIDAR Sensor},
   author={Filotheou, Alexandros},
   journal={arXiv:2307.14247},
