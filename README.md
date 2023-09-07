@@ -14,7 +14,7 @@ https://github.com/li9i/cbgl/assets/1658819/5794cd21-651d-4924-b453-25c46b9e42a9
 
 ## Dependencies
 
-You will need `CGAL` and `fftw3` as dependencies.
+You will need [`csm`](https://github.com/AndreaCensi/csm), `CGAL` and `fftw3` as dependencies.
 
 ## How to get and build
 
