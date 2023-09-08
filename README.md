@@ -1,8 +1,8 @@
 # CBGL
 
-`cbgl` is a ROS package that allows you to localise your 2D LIDAR sensor in a
-given 2D metric map under global uncertainty in position and orientation,
-written in C++.
+`cbgl` is a ROS package written in C++ that allows you to localise your 2D
+LIDAR sensor in a given 2D map under global uncertainty in position and
+orientation.
 
 <!--
 Click on the image for a brief demo
@@ -21,7 +21,7 @@ as dependencies. Then, as always
 
 ```sh
 cd ~/catkin_ws/src
-git clone https://github.com/li9i/cbgl
+git clone git@github.com:li9i/cbgl.git
 cd ..
 catkin build cbgl
 ```
@@ -35,20 +35,13 @@ Build the image with the most recent code of this repository
 cd ~/catkin_ws/src
 git clone git@github.com:li9i/cbgl.git
 cd cbgl/docker
-./build_cbgl_image.sh
+docker build -t li9i/cbgl:latest .
 ```
 
 or pull it from dockerhub:
 
 ```
 docker pull li9i/cbgl
-
-docker run -it \
-    --name=cbgl_container \
-    --env="DISPLAY=$DISPLAY" \
-    --net=host \
-    --rm \
-    li9i/cbgl:latest
 ```
 
 
