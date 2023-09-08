@@ -38,12 +38,6 @@ cd cbgl/docker
 docker build -t li9i/cbgl:latest .
 ```
 
-or pull it from dockerhub:
-
-```
-docker pull li9i/cbgl
-```
-
 
 ## How to launch `cbgl`
 
@@ -58,11 +52,17 @@ roslaunch cbgl cbgl.launch map_png_file:=/my/maps/map.png
 
 ### Via Docker
 
-You will need to modify line `42` accordingly (to read as above), and then
+You will need to modify line `42` in `docker/Dockerfile` accordingly (to read as above), and then
 
 ```
-./run_cbgl_container.sh
+docker run -it \
+    --name=cbgl_container \
+    --env="DISPLAY=$DISPLAY" \
+    --net=host \
+    --rm \
+    li9i/cbgl:latest
 ```
+or `./run_cbgl_container.sh` within the `docker` directory.
 
 ## How to call `cbgl`
 
