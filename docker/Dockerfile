@@ -17,6 +17,7 @@ RUN useradd -ms /bin/bash li9i
 USER li9i
 WORKDIR /home/li9i
 
+COPY map.png /home/li9i
 RUN echo "source /opt/ros/kinetic/setup.bash" >> /home/li9i/.bashrc
 RUN echo "source /home/li9i/catkin_ws/devel/setup.bash" >> /home/li9i/.bashrc
 
@@ -39,7 +40,7 @@ RUN mkdir -p /home/li9i/catkin_ws/src && \
 RUN echo "#!/bin/bash" > /home/li9i/cbgl_launch.sh
 RUN echo "source /opt/ros/kinetic/setup.bash" >> /home/li9i/cbgl_launch.sh
 RUN echo "source /home/li9i/catkin_ws/devel/setup.bash" >> /home/li9i/cbgl_launch.sh
-RUN echo "roslaunch cbgl cbgl.launch" >> /home/li9i/cbgl_launch.sh
+RUN echo "roslaunch cbgl cbgl.launch map_png_file:=/home/li9i/map.png" >> /home/li9i/cbgl_launch.sh
 RUN chmod +x /home/li9i/cbgl_launch.sh
 
 ENTRYPOINT bash /home/li9i/cbgl_launch.sh

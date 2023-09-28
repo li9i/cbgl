@@ -42,17 +42,23 @@ docker build -t li9i/cbgl:latest .
 ## How to launch `cbgl`
 
 Before launching your robot, map, etc, you will need to export the map of your
-environment, say `map.pgm`, into a .`png` file with the same name (`map.png`).
+environment, say `map_X.pgm`, into a .`png` file with the same name (`map_X.png`)
+under the `docker` directory.
 
 ### Via traditional means
 
 ```sh
-roslaunch cbgl cbgl.launch map_png_file:=/my/maps/map.png
+roslaunch cbgl cbgl.launch map_png_file:=~/catkin_ws/src/cbgl/docker/map_X.png
 ```
 
 ### Via Docker
 
-You will need to modify line `42` in `docker/Dockerfile` accordingly (to read as above), and then
+You will need to replace in `docker/Dockerfile` the map's filename
+
+- in line `20` (`COPY map_X.png /home/li9i`)
+- in line `42` (`RUN echo "roslaunch cbgl cbgl.launch map_png_file:=/home/li9i/map_X.png" >> /home/li9i/cbgl_launch.sh`).
+
+This is for docker to be able to read the `.png` file from the host machine. Then
 
 ```
 docker run -it \
