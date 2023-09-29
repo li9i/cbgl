@@ -1,9 +1,5 @@
 <launch>
 
-    <!-- The map should be transformed to .png file for purposes of raycasting.
-         `map_png_file` provides the path to the png file -->
-  <arg name="map_png_file" />
-
   <!-- CBGL -->
   <node pkg="cbgl" type="cbgl_node" name="cbgl_node" output="screen">
 
@@ -15,9 +11,6 @@
 
     <!-- FSM parameters (when FOV = 2π)-->
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_fsm.yaml" />
-
-    <!-- The map should be transformed to .png file for purposes of raycasting -->
-    <param name="map_png_file" value="$(arg map_png_file)" />
 
   </node>
 

@@ -9,6 +9,9 @@ map_topic: "/map"
 scan_topic: "/scan"
 output_pose_topic: "/initialpose"
 
+# input png map absolute path (needed by the library that performs raycasting)
+map_png_file: "/home/li9i/map.png"
+
 # call me
 global_localisation_service_name: "/global_localization"
 
