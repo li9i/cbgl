@@ -1,7 +1,8 @@
 # reference frames
-fixed_frame_id: "map"
-base_frame_id: "base_footprint"
-odom_frame_id: "odom"
+fixed_frame_id: "map"             # The global reference frame
+base_frame_id: "base_footprint"   # The localised frame
+odom_frame_id: "odom"             # If `tf_broadcast` is true then the
+                                  # fixed_frame_id <-- odom_frame_id transform is broadcast
 tf_broadcast: true
 
 # input topics
@@ -15,6 +16,10 @@ map_png_file: "/home/li9i/map.png"
 # call me
 global_localisation_service_name: "/global_localization"
 
+# Pose densities. The product dl x da determines how many pose hypotheses are
+# dispersed per square meter of map area within the map. The higher the density
+# the more probable it is that localisation will be successful, at the expense
+# of execution time.
 # Locational density in poses per sqm
 dl: 15
 
@@ -34,13 +39,14 @@ map_scan_method: "ray_marching"
 # z axis points {upwards|downwards}
 laser_z_orientation: "upwards"
 
-# Undersample number of ranges (CBGL is robust to decreasing number of ranges +
-# reduction in number of ranges means less execution time)
-do_undersample_scan: false
+# Undersample number of ranges (CBGL is robust to decreasing number of ranges;
+# + reduction in number of ranges means less execution time)
+do_undersample_scan: true
 
 # if undersample_rate = 4 then 1 out of 4 rays are considered
 undersample_rate: 1
 
-# global pose retrieval method (do_icp AND do_fmt should equal FALSE)
-do_icp: false
-do_fsm: true
+# global pose retrieval method (do_icp AND do_fmt should equal FALSE).
+# fsm works only with panoramic sensors; icp does not discriminate
+do_icp: true
+do_fsm: false

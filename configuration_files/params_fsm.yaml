@@ -1,5 +1,3 @@
-# FSM parameters
-
 # size_scan <= ranges.size() (meaning you can downsample with this param)
 size_scan:              360
 min_magnification_size: 0
