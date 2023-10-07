@@ -13,19 +13,19 @@ RUN rosdep init
 
 # Use bash and create user
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN useradd -ms /bin/bash li9i
-USER li9i
-WORKDIR /home/li9i
+RUN useradd -ms /bin/bash user_cbgl
+USER user_cbgl
+WORKDIR /home/user_cbgl
 
-COPY map.png /home/li9i
-RUN echo "source /opt/ros/kinetic/setup.bash" >> /home/li9i/.bashrc
-RUN echo "source /home/li9i/catkin_ws/devel/setup.bash" >> /home/li9i/.bashrc
+COPY map.png /home/user_cbgl
+RUN echo "source /opt/ros/kinetic/setup.bash" >> /home/user_cbgl/.bashrc
+RUN echo "source /home/user_cbgl/catkin_ws/devel/setup.bash" >> /home/user_cbgl/.bashrc
 
 RUN rosdep update
-RUN mkdir -p /home/li9i/catkin_ws/src && \
-    cd /home/li9i/catkin_ws/src/ && \
+RUN mkdir -p /home/user_cbgl/catkin_ws/src && \
+    cd /home/user_cbgl/catkin_ws/src/ && \
     git clone https://github.com/li9i/cbgl.git && \
-    cd /home/li9i/catkin_ws && \
+    cd /home/user_cbgl/catkin_ws && \
     export CC=gcc && \
     export CXX=g++ && \
     alias g++='g++ -std=c++11' && \
@@ -33,14 +33,14 @@ RUN mkdir -p /home/li9i/catkin_ws/src && \
     source /opt/ros/kinetic/setup.bash && \
     catkin build cbgl && \
     source /opt/ros/kinetic/setup.bash && \
-    source /home/li9i/catkin_ws/devel/setup.bash
+    source /home/user_cbgl/catkin_ws/devel/setup.bash
 
 # The next five lines + the entrypoint command will make sure that
 # when the container is run the cbgl node is roslaunched immediately
-RUN echo "#!/bin/bash" > /home/li9i/cbgl_launch.sh
-RUN echo "source /opt/ros/kinetic/setup.bash" >> /home/li9i/cbgl_launch.sh
-RUN echo "source /home/li9i/catkin_ws/devel/setup.bash" >> /home/li9i/cbgl_launch.sh
-RUN echo "roslaunch cbgl cbgl.launch map_png_file:=/home/li9i/map.png" >> /home/li9i/cbgl_launch.sh
-RUN chmod +x /home/li9i/cbgl_launch.sh
+RUN echo "#!/bin/bash" > /home/user_cbgl/cbgl_launch.sh
+RUN echo "source /opt/ros/kinetic/setup.bash" >> /home/user_cbgl/cbgl_launch.sh
+RUN echo "source /home/user_cbgl/catkin_ws/devel/setup.bash" >> /home/user_cbgl/cbgl_launch.sh
+RUN echo "roslaunch cbgl cbgl.launch map_png_file:=/home/user_cbgl/map.png" >> /home/user_cbgl/cbgl_launch.sh
+RUN chmod +x /home/user_cbgl/cbgl_launch.sh
 
-ENTRYPOINT bash /home/li9i/cbgl_launch.sh
+ENTRYPOINT bash /home/user_cbgl/cbgl_launch.sh

@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>cbgl</name>
-  <version>0.0.0</version>
+  <version>1.0.1</version>
   <description>The caer-based global localisation package</description>
 
-  <maintainer email="alefilo@auth.gr">li9i</maintainer>
+  <maintainer email="alefilot@auth.gr">li9i</maintainer>
 
   <license>TODO</license>
 

@@ -16,8 +16,9 @@ https://github.com/li9i/cbgl/assets/1658819/5794cd21-651d-4924-b453-25c46b9e42a9
 
 ### Via traditional means
 
-You will need [`csm`](https://github.com/AndreaCensi/csm), `CGAL` and `fftw3`
-as dependencies. Then, as always
+This package was tested and works under Ubuntu 16.04 and ROS kinetic (I'm so
+sorry). You will need [`csm`](https://github.com/AndreaCensi/csm), `CGAL 4.7`
+and `fftw3` as dependencies. Then, as always
 
 ```sh
 cd ~/catkin_ws/src
@@ -25,6 +26,9 @@ git clone git@github.com:li9i/cbgl.git
 cd ..
 catkin build cbgl
 ```
+
+`cbgl` may also be installed and executed via Docker for purposes of ease of
+installation.
 
 ### Via Docker
 
@@ -57,7 +61,7 @@ roslaunch cbgl cbgl.launch
 
 ### Via Docker
 
-You will need to replace the map's _relative_ filename (`COPY map_X.png /home/li9i`)
+You will need to replace the map's relative filename (`COPY map_X.png /home/user_cbgl`)
 in line  `13` in `docker/Dockerfile`. This is for docker to be able to read the
 `.png` file from the host machine. Then
 
