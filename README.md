@@ -27,8 +27,7 @@ cd ..
 catkin build cbgl
 ```
 
-`cbgl` may also be installed and executed via Docker for purposes of ease of
-installation.
+For your convenience `cbgl` may also be installed and executed via Docker.
 
 ### Via Docker
 
@@ -49,9 +48,9 @@ Before launching your robot, map, etc, you will need to
 
 - export the map of your environment, say `map_X.pgm`, into a .`png` file
 (`map_X.png`; `gimp` does it). If you plan on launching `cbgl` via docker then
-`map_X.png` needs to reside under the `docker` directory.
-- set the `map_png_file` variable to point to the absolute path
-of `map_X.png` in file `configuration_files/params_cbgl.yaml`.
+`map_X.png` needs to be residing under the `docker` directory.
+-  in file `configuration_files/params_cbgl.yaml`: set the `map_png_file`
+variable to point to the absolute path of `map_X.png`.
 
 ### Via traditional means
 
