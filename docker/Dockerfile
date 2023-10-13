@@ -40,7 +40,7 @@ RUN mkdir -p /home/user_cbgl/catkin_ws/src && \
 RUN echo "#!/bin/bash" > /home/user_cbgl/cbgl_launch.sh
 RUN echo "source /opt/ros/kinetic/setup.bash" >> /home/user_cbgl/cbgl_launch.sh
 RUN echo "source /home/user_cbgl/catkin_ws/devel/setup.bash" >> /home/user_cbgl/cbgl_launch.sh
-RUN echo "roslaunch cbgl cbgl.launch map_png_file:=/home/user_cbgl/map.png" >> /home/user_cbgl/cbgl_launch.sh
+RUN echo "roslaunch cbgl cbgl.launch" >> /home/user_cbgl/cbgl_launch.sh
 RUN chmod +x /home/user_cbgl/cbgl_launch.sh
 
 ENTRYPOINT bash /home/user_cbgl/cbgl_launch.sh
