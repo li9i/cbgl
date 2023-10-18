@@ -61,7 +61,7 @@ roslaunch cbgl cbgl.launch
 ### Via Docker
 
 You will need to replace the map's relative filename (`COPY map_X.png /home/user_cbgl`)
-in line  `20` in `docker/Dockerfile`. This is for docker to be able to read the
+in line  `13` in `docker/Dockerfile`. This is for docker to be able to read the
 `.png` file from the host machine. Then
 
 ```
