@@ -11,7 +11,7 @@ map of the sensor's environment.
 - It is fast: in the video below the environment area is $`2000`$ m$`^2`$
 and localisation is performed in under four seconds. In general you can expect
 the execution time to roughly have an order of magnitude of
-$`\text{area} \cdot \dfrac{N_s}{360}` \cdot 10^{-2}$ seconds, where
+$`\text{area} \cdot \dfrac{N_s}{360} \cdot 10^{-2}`$ seconds, where
 $`N_s`$ is the LIDAR's number of rays.
 
 <!--
