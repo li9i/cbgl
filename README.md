@@ -31,6 +31,9 @@ For your convenience `cbgl` may also be installed and executed via Docker.
 
 ### Via Docker
 
+If this is your first time running docker then I happen to find
+[this](https://youtu.be/SAMPOK_lazw?t=67) docker installation guide very
+friendly and easy to follow.
 
 Build the image with the most recent code of this repository
 
