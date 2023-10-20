@@ -23,7 +23,7 @@ and `fftw3` as dependencies. Then, as always
 ```sh
 cd ~/catkin_ws/src
 git clone git@github.com:li9i/cbgl.git
-cd ..
+cd cbgl; mv cbgl/* $PWD; rmdir cbgl; cd ../..
 catkin build cbgl
 ```
 
