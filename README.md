@@ -44,12 +44,15 @@ docker build --progress=plain --no-cache -t li9i/cbgl:latest .
 
 ## How to launch `cbgl`
 
-Before launching your robot, map, etc, you will need to
+Before launching your robot, cbgl, etc, you will need to
 
 - export the map of your environment, say `map_x.pgm`, into a .`png` file
 (`map_x.png`; `gimp` does it)
+- place `map_x.png` into `cbgl/map/`
 -  in file `configuration_files/params_cbgl.yaml`: set the `map_png_file`
-variable to point to the absolute path of `map_x.png`
+variable to point to the absolute path of `map_x.png` within the container path
+structure, e.g.
+`map_png_file: "/home/user_cbgl/catkin_ws/src/cbgl/map/map_x.png"`
 
 ### Via traditional means
 
