@@ -80,7 +80,7 @@ Finally `cbgl` can be called as a service with
 rosservice call /global_localization
 ```
 
-## Input/output in a glance
+## Input/output at a glance
 - [IN]  A `sensor_msgs/LaserScan` message published through topic `configuration_files/scan_topic`
 - [IN]  A `nav_msgs/OccupancyGrid` message published through topic `configuration_files/map_topic`
 - [OUT] A `geometry_msgs/PoseWithCovarianceStamped` message published through topic `configuration_files/output_pose_topic`
