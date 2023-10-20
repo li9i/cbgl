@@ -35,12 +35,10 @@ If this is your first time running docker then I happen to find
 [this](https://youtu.be/SAMPOK_lazw?t=67) docker installation guide very
 friendly and easy to follow.
 
-Build the image with the most recent code of this repository
+Build the image with the most recent code of this repository with:
 
 ```
-cd ~/catkin_ws/src
-git clone git@github.com:li9i/cbgl.git
-cd cbgl
+git clone git@github.com:li9i/cbgl.git; cd cbgl
 docker build --progress=plain --no-cache -t li9i/cbgl:latest .
 ```
 
@@ -50,12 +48,12 @@ docker build --progress=plain --no-cache -t li9i/cbgl:latest .
 Before launching your robot, cbgl, etc, you will need to
 
 - export the map of your environment, say `map_x.pgm`, into a .`png` file
-(`map_x.png`; `gimp` does it)
+(that is `map_x.png`; `gimp` does it)
 - place `map_x.png` into `cbgl/map/`
 -  in file `configuration_files/params_cbgl.yaml`: set the `map_png_file`
 variable to point to the absolute path of `map_x.png` within the container path
 structure, e.g.
-`map_png_file: "/home/user_cbgl/catkin_ws/src/cbgl/map/map_x.png"`
+```map_png_file: "/home/user_cbgl/catkin_ws/src/cbgl/map/map_x.png"```
 
 ### Via traditional means
 
