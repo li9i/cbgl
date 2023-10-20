@@ -8,9 +8,9 @@ orientation.
 - Unlike other approaches `cbgl` does not require motion for performing global
 localisation. All it really needs is a single laser scan measurement and the
 map of the sensor's environment.
-- It is fast: in the video below the environment area is $`2000 \text{m}^2`$
+- It is fast: in the video below the environment area is $`2000`$ m$`^2`$
 and localisation is performed in under four seconds. In general you can expect
-execution time to roughly be
+execution time $`t`$ to roughly be
 $`t = 10^{-2} \cdot \text{area} \cdot \dfrac{N_s}{360}`$, where
 $`N_s`$ is the LIDAR's number of rays.
 
