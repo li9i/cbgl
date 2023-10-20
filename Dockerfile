@@ -10,15 +10,16 @@ RUN useradd -ms /bin/bash user_cbgl
 USER user_cbgl
 WORKDIR /home/user_cbgl
 
-COPY map.png /home/user_cbgl
 RUN echo "source /opt/ros/kinetic/setup.bash" >> /home/user_cbgl/.bashrc
 RUN echo "source /home/user_cbgl/catkin_ws/devel/setup.bash" >> /home/user_cbgl/.bashrc
 
 RUN rosdep update
 RUN mkdir -p /home/user_cbgl/catkin_ws/src && \
-    cd /home/user_cbgl/catkin_ws/src/ && \
-    git clone https://github.com/li9i/cbgl.git && \
-    cd /home/user_cbgl/catkin_ws && \
+    cd /home/user_cbgl/catkin_ws/src/
+
+COPY cbgl/ /home/user_cbgl/catkin_ws/src/cbgl/
+
+RUN cd /home/user_cbgl/catkin_ws && \
     export CC=gcc && \
     export CXX=g++ && \
     alias g++='g++ -std=c++11' && \

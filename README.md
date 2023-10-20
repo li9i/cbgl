@@ -37,8 +37,8 @@ Build the image with the most recent code of this repository
 ```
 cd ~/catkin_ws/src
 git clone git@github.com:li9i/cbgl.git
-cd cbgl/docker
-docker build -t li9i/cbgl:latest .
+cd cbgl
+docker build --progress=plain --no-cache -t li9i/cbgl:latest .
 ```
 
 
@@ -46,11 +46,10 @@ docker build -t li9i/cbgl:latest .
 
 Before launching your robot, map, etc, you will need to
 
-- export the map of your environment, say `map_X.pgm`, into a .`png` file
-(`map_X.png`; `gimp` does it). If you plan on launching `cbgl` via docker then
-`map_X.png` needs to be residing under the `docker` directory.
+- export the map of your environment, say `map_x.pgm`, into a .`png` file
+(`map_x.png`; `gimp` does it)
 -  in file `configuration_files/params_cbgl.yaml`: set the `map_png_file`
-variable to point to the absolute path of `map_X.png`.
+variable to point to the absolute path of `map_x.png`
 
 ### Via traditional means
 
@@ -60,10 +59,6 @@ roslaunch cbgl cbgl.launch
 
 ### Via Docker
 
-You will need to replace the map's relative filename (`COPY map_X.png /home/user_cbgl`)
-in line  `13` in `docker/Dockerfile`. This is for docker to be able to read the
-`.png` file from the host machine. Then
-
 ```
 docker run -it \
     --name=cbgl_container \
@@ -72,7 +67,6 @@ docker run -it \
     --rm \
     li9i/cbgl:latest
 ```
-or `./run_cbgl_container.sh` within the `docker` directory.
 
 ## How to call `cbgl`
 
