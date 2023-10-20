@@ -8,6 +8,8 @@ tf_broadcast: true
 # input topics
 map_topic: "/map"
 scan_topic: "/scan"
+
+# output topics
 output_pose_topic: "/initialpose"
 
 # input png map absolute path (needed by the library that performs raycasting)

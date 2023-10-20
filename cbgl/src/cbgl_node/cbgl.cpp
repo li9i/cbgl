@@ -1898,11 +1898,14 @@ CBGL::scanCallback(
   // if first scan cache needed stuff ------------------------------------------
   if (!received_scan_)
   {
-    // cache the static tf from base to laser
-    if (!getBaseToLaserTf(s_->header.frame_id))
+    // cache the static tf from base to laser if output is required as transform
+    if (tf_broadcast_)
     {
-      ROS_WARN("[CBGL] Skipping scan");
-      return;
+      if (!getBaseToLaserTf(s_->header.frame_id))
+      {
+        ROS_WARN("[CBGL] Skipping scan");
+        return;
+      }
     }
 
     if (do_fsm_)

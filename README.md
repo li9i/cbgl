@@ -80,6 +80,12 @@ Finally `cbgl` can be called as a service with
 rosservice call /global_localization
 ```
 
+## Input/output in a glance
+- [IN]  A `sensor_msgs/LaserScan` message published through topic `configuration_files/scan_topic`
+- [IN]  A `nav_msgs/OccupancyGrid` message published through topic `configuration_files/map_topic`
+- [OUT] A `geometry_msgs/PoseWithCovarianceStamped` message published through topic `configuration_files/output_pose_topic`
+- [OUT] The transform between the `odom` frame and the `map` frame if `configuration_files/tf_broadcast` is set to `true`
+
 
 ## Citation
 If you have used `cbgl` in your research please consider citing the following preprint:
