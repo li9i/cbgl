@@ -4,15 +4,13 @@
 LIDAR sensor in a given 2D map under global uncertainty in position and
 orientation.
 
-## Why use CBGL for global localisation
-- Unlike other approaches `cbgl` does not require motion for performing global
-localisation. All it really needs is a single laser scan measurement and the
-map of the sensor's environment.
-- It is fast: in the video below the environment area is $`2000`$ m$`^2`$
-and localisation is performed in under four seconds. In general you can expect
-the execution time to roughly have an order of magnitude of
-$`\text{area} \cdot \dfrac{N_s}{360} \cdot 10^{-2}`$ seconds, where
-$`N_s`$ is the LIDAR's number of rays.
+`cbgl` does not require motion for performing global localisation. All it
+really needs is a single laser scan measurement and the map of the sensor's
+environment. In general you can expect the execution time to roughly have an
+order of magnitude of $`\text{area} \cdot \dfrac{N_s}{360} \cdot 10^{-2}`$
+seconds, where $`N_s`$ is the LIDAR's number of rays. In the video below the
+environment area is $`2000`$ m$`^2`$ and localisation is performed in under
+four seconds.
 
 <!--
 Click on the image for a brief demo
