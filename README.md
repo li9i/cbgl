@@ -4,14 +4,14 @@
 LIDAR sensor in a given 2D map under global uncertainty in position and
 orientation.
 
-It does not require motion for performing global localisation: it's a one-shot
-approach that only requires a single laser scan measurement and the map of the
-sensor's environment.
-You can expect the execution time to roughly have an order of magnitude of
-$`\text{area} \cdot \dfrac{N_s}{360} \cdot 10^{-2}`$ seconds, where $`N_s`$ is
-the LIDAR's number of rays, but, strictly speaking, it varies according to the
-geometry of the environment. In the video below the environment area is
-$`2000`$ m$`^2`$ and localisation is performed in under four seconds.
+`cbgl` does not require motion for performing global localisation: it's a
+one-shot approach that only requires a single laser scan measurement and the
+map of the sensor's environment.  You can expect the execution time to roughly
+have an order of magnitude of $`\text{area} \cdot \dfrac{N_s}{360} \cdot
+10^{-2}`$ seconds, where $`N_s`$ is the LIDAR's number of rays, but, strictly
+speaking, it varies according to the geometry of the environment. In the video
+below the environment area is $`2000`$ m$`^2`$ and localisation is performed in
+under four seconds.
 
 <!--
 Click on the image for a brief demo
