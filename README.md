@@ -97,7 +97,6 @@ rosservice call /global_localization
 
 
 ## Citation
-If you have used `cbgl` in your research please consider citing the following preprint:
 
 ```bibtex
 @article{cbgl,
