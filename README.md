@@ -1,4 +1,4 @@
-# CBGL
+# CBGL: Fast Monte Carlo Passive Global Localisation of 2D LIDAR Sensor
 
 #### [[ arXiv ](https://arxiv.org/abs/2307.14247)] [[ Video ](https://www.youtube.com/watch?v=xaDKjI0WkDc)]
 
