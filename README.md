@@ -23,7 +23,7 @@ Click on the image for a brief demo
 
 https://github.com/li9i/cbgl/assets/1658819/5794cd21-651d-4924-b453-25c46b9e42a9
 
-## How to install `cbgl`
+## Install
 
 ### Via Docker
 
@@ -51,7 +51,7 @@ cd cbgl; mv cbgl/* $PWD; rmdir cbgl; cd ../..
 catkin build cbgl
 ```
 
-## How to launch `cbgl`
+## Launch
 
 Before launching your robot, cbgl, etc, you will need to
 
@@ -83,7 +83,7 @@ roslaunch cbgl cbgl.launch
 ```
 
 
-## How to call `cbgl`
+## Call
 
 Finally `cbgl` can be called as a service with
 
