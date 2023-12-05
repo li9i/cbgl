@@ -23,6 +23,20 @@ Click on the image for a brief demo
 
 https://github.com/li9i/cbgl/assets/1658819/5794cd21-651d-4924-b453-25c46b9e42a9
 
+
+Table of Contents
+=================
+* [Install](#install)
+  * [Via Docker](#via-docker)
+  * [Via traditional means](#via-traditional-means)
+* [Launch](#launch)
+  * [Via Docker](#via-docker-1)
+  * [Via traditional means](#via-traditional-means-1)
+* [Call](#call)
+* [Input/output at a glance](#inputoutput-at-a-glance)
+* [Citation](#citation)
+
+
 ## Install
 
 ### Via Docker
