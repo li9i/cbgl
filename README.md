@@ -6,7 +6,7 @@
 LIDAR sensor in a given 2D map under global uncertainty in position and
 orientation.
 
-`cbgl` does not require motion for performing global localisation: it's a
+CBGL does not require motion for performing global localisation: it's a
 one-shot approach that only requires a single laser scan measurement and the
 map of the sensor's environment.  You can expect the execution time to roughly
 have an order of magnitude of $`\text{area} \cdot \dfrac{N_s}{360} \cdot
@@ -67,16 +67,16 @@ catkin build cbgl
 
 ## Launch
 
-Before launching your robot, cbgl, etc, you will need to
+Before launching your robot, `cbgl`, etc, you will need to
 
 - export the map of your environment, say `map_x.pgm`, into a .`png` file
 (that is `map_x.png`; `gimp` does it)
 - place `map_x.png` into `cbgl/map/`
 -  in file `configuration_files/params_cbgl.yaml`: set the `map_png_file`
 variable to point to the absolute path of `map_x.png`
-    - If you run cbgl via docker then the path needs to be expressed relative to the *container's path structure*, e.g.
+    - If you run `cbgl` via docker then the path needs to be expressed relative to the *container's path structure*, e.g.
     ```map_png_file: "/home/user_cbgl/catkin_ws/src/cbgl/map/map_x.png"```
-    - If you run cbgl via traditional means then the path needs to be expressed relative to your own machine's path structure, e.g.
+    - If you run `cbgl` via traditional means then the path needs to be expressed relative to your own machine's path structure, e.g.
     ```map_png_file: "/home/me/catkin_ws/src/cbgl/map/map_x.png"```
 
 ### Via Docker
@@ -99,7 +99,7 @@ roslaunch cbgl cbgl.launch
 
 ## Call
 
-Finally `cbgl` can be called as a service with
+Finally CBGL can be called as a service with
 
 ```sh
 rosservice call /global_localization
