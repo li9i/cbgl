@@ -10,9 +10,10 @@ CBGL does not require motion for performing global localisation: it's a
 one-shot approach that only requires a single laser scan measurement and the
 map of the sensor's environment.  You can expect the execution time to roughly
 have an order of magnitude of $`\text{area} \cdot \dfrac{N_s}{360} \cdot
-10^{-2}`$ seconds, where $`N_s`$ is the LIDAR's number of rays (strictly
+10^{-2}`$ seconds, where $\text{area}$ is the area of the map's free space and
+$`N_s`$ is the LIDAR's number of rays. (Strictly
 speaking the execution time varies according to the geometry of the
-environment and other factors). In the video below the environment area is
+environment and other factors.) In the video below the environment area is
 $`2000`$ m$`^2`$ and localisation is performed in under four seconds.
 
 <!--
