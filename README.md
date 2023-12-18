@@ -20,6 +20,8 @@ $`2000`$ m$`^2`$ and localisation is performed in under four seconds.
 Click on the image for a brief demo
 [![CBGL in Willowgarage](https://img.youtube.com/vi/DkKdxFNJG4g/maxresdefault.jpg)](https://youtu.be/DkKdxFNJG4g)
 -->
+https://github.com/li9i/cbgl/assets/1658819/5794cd21-651d-4924-b453-25c46b9e42a9
+
 Video 1: A panoramic 2D LIDAR sensor mounted on a turtlebot 2 is spawned into
 an environment at a pose whose immediate surroundings are repeated in (almost)
 the same geometry and proportions at locations other than the sensor's spawning
@@ -28,7 +30,7 @@ robot at a second challenging pose, at which she calls it for a second time.
 Both times `cbgl` is successful in estimating the sensor's pose.
 
 
-https://github.com/li9i/cbgl/assets/1658819/5794cd21-651d-4924-b453-25c46b9e42a9
+
 
 
 Table of Contents
