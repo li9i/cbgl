@@ -129,4 +129,5 @@ rosservice call /global_localization
   title={CBGL: Fast Monte Carlo Passive Global Localisation of 2D LIDAR Sensor},
   author={Filotheou, Alexandros},
   journal={arXiv:2307.14247},
+  url={https://arxiv.org/abs/2307.14247}
   year={2023}}
