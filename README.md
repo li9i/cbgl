@@ -1,6 +1,7 @@
 # CBGL: Fast Monte Carlo Passive Global Localisation of 2D LIDAR Sensor
 
-#### [[ arXiv ](https://arxiv.org/abs/2307.14247)] [[ Video ](https://www.youtube.com/watch?v=xaDKjI0WkDc)]
+#### [![arxiv.org](http://img.shields.io/badge/cs.CV-arXiv%3A2402.13616-B31B1B.svg)](https://arxiv.org/abs/2307.14247) [[ Video ](https://www.youtube.com/watch?v=xaDKjI0WkDc)]
+
 
 `cbgl` is a ROS package written in C++ that allows you to localise your 2D
 LIDAR sensor in a given 2D map under global uncertainty in position and
