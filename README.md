@@ -1,6 +1,6 @@
 # CBGL: Fast Monte Carlo Passive Global Localisation of 2D LIDAR Sensor
 
-#### [![arxiv.org](http://img.shields.io/badge/cs.RO-arXiv%3A2307.14247-B31B1B.svg)](https://arxiv.org/abs/2307.14247) [[ Video ](https://www.youtube.com/watch?v=xaDKjI0WkDc)]
+#### [![arxiv.org](http://img.shields.io/badge/cs.RO-arXiv%3A2307.14247-B31B1B.svg)](https://arxiv.org/abs/2307.14247) [![youtube.com](https://img.shields.io/badge/2'_presentation-YouTube-FF0000)](https://www.youtube.com/watch?v=xaDKjI0WkDc)
 
 
 `cbgl` is a ROS package written in C++ that allows you to localise your 2D
@@ -84,7 +84,7 @@ Before launching your robot, `cbgl`, etc, you will need to
 (that is `map_x.png`; `gimp` does it)
 - place `map_x.png` into `cbgl/map/`
 -  in file `configuration_files/params_cbgl.yaml`: set the `map_png_file`
-variable to point to the absolute path of `map_x.png`
+   variable to point to the absolute path of `map_x.png`
     - If you run `cbgl` via docker then the path needs to be expressed relative to the *container's path structure*, e.g.
     ```map_png_file: "/home/user_cbgl/catkin_ws/src/cbgl/map/map_x.png"```
     - If you run `cbgl` via traditional means then the path needs to be expressed relative to your own machine's path structure, e.g.
