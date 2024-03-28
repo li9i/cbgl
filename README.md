@@ -3,19 +3,11 @@
 #### [![arxiv.org](http://img.shields.io/badge/cs.RO-arXiv%3A2307.14247-B31B1B.svg)](https://arxiv.org/abs/2307.14247) [![youtube.com](https://img.shields.io/badge/2'_presentation-YouTube-FF0000)](https://www.youtube.com/watch?v=xaDKjI0WkDc)
 
 
-`cbgl` is a ROS package written in C++ that allows you to localise your 2D
-LIDAR sensor in a given 2D map under global uncertainty in position and
-orientation in minimal time.
+`cbgl` is a ROS package written in C++ that allows you to localise your 2D LIDAR sensor in a given 2D map under global uncertainty in position and orientation in minimal time.
 
-CBGL does not require motion for performing global localisation: it's a
-one-shot approach that only requires a single laser scan measurement and the
-map of the sensor's environment.  You can expect the execution time to roughly
-have an order of magnitude of $`\text{area} \cdot \dfrac{N_s}{360} \cdot
-10^{-2}`$ seconds, where $\text{area}$ is the area of the map's free space and
-$`N_s`$ is the LIDAR's number of rays. (Strictly
-speaking the execution time varies according to the geometry of the
-environment and other factors.) In the video below the environment area is
-$`2000`$ m$`^2`$ and localisation is performed in under four seconds.
+- CBGL does not require motion for performing global localisation: it's a one-shot approach that only requires a single laser scan measurement and the map of the sensor's environment
+
+- You can expect the execution time to roughly have an order of magnitude of $`\text{area} \cdot \dfrac{N_s}{360} \cdot 10^{-2}`$ seconds, where $\text{area}$ is the area of the map's free space and $`N_s`$ is the LIDAR's number of rays. (Strictly speaking the execution time varies according to the geometry of the environment and other factors.) In the video below the environment area is $`2000`$ m$`^2`$ and localisation is performed in under four seconds.
 
 <!--
 Click on the image for a brief demo
@@ -107,23 +99,24 @@ docker run -it \
 roslaunch cbgl cbgl.launch
 ```
 
-
 ## Call
 
-Finally CBGL can be called as a service with
+Launching `cbgl` simply makes it go into stand-by mode and does not actually execute global localisation. To do so simply call the provided service
 
 ```sh
 rosservice call /global_localization
 ```
 
 ## Input/output at a glance
-- [IN]  A `sensor_msgs/LaserScan` message published through topic `configuration_files/scan_topic`
-- [IN]  A `nav_msgs/OccupancyGrid` message published through topic `configuration_files/map_topic`
-- [OUT] A `geometry_msgs/PoseWithCovarianceStamped` message published through topic `configuration_files/output_pose_topic`
-- [OUT] The transform between the `odom` frame and the `map` frame if `configuration_files/tf_broadcast` is set to `true`
+- [in]  A `sensor_msgs/LaserScan` message published through topic `configuration_files/scan_topic`
+- [in]  A `nav_msgs/OccupancyGrid` message published through topic `configuration_files/map_topic`
+- [out] A `geometry_msgs/PoseWithCovarianceStamped` message published through topic `configuration_files/output_pose_topic`
+- [out] The transform between the `odom` frame and the `map` frame if `configuration_files/tf_broadcast` is set to `true`
 
 
 ## Citation
+
+This repository holds the implementation of CBGL, whose theoretical underpinning and key performance aspects are presented in the following preprint
 
 ```bibtex
 @article{cbgl,
