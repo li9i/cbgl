@@ -3,11 +3,11 @@
 #### [![arxiv.org](http://img.shields.io/badge/cs.RO-arXiv%3A2307.14247-B31B1B.svg)](https://arxiv.org/abs/2307.14247) [![youtube.com](https://img.shields.io/badge/2'_presentation-YouTube-FF0000)](https://www.youtube.com/watch?v=xaDKjI0WkDc)
 
 
-`cbgl` is a ROS package written in C++ that allows you to localise your 2D LIDAR sensor in a given 2D map under global uncertainty in position and orientation in minimal time.
+`cbgl` is a ROS package written in C++ that allows you to localise your 2D LIDAR sensor in a given 2D map under global uncertainty in position and orientation in minimal time
 
 - CBGL does not require motion for performing global localisation: it's a one-shot approach that only requires a single laser scan measurement and the map of the sensor's environment
 
-- You can expect the execution time to roughly have an order of magnitude of $`\text{area} \cdot \dfrac{N_s}{360} \cdot 10^{-2}`$ seconds, where $\text{area}$ is the area of the map's free space and $`N_s`$ is the LIDAR's number of rays. (Strictly speaking the execution time varies according to the geometry of the environment and other factors.) In the video below the environment area is $`2000`$ m$`^2`$ and localisation is performed in under four seconds.
+- You can expect the execution time to roughly have an order of magnitude of $`\dfrac{\text{area} \cdot N_s}{10\texttt{e}04 \cdot \pi}`$ seconds, where $\text{area}$ is the area of the map's free space and $`N_s`$ is the LIDAR's number of rays. (Strictly speaking the execution time varies according to the geometry of the environment and other factors.) In the video below the environment area is $`2000`$ m$`^2`$ and localisation is performed in under four seconds.
 
 <!--
 Click on the image for a brief demo
@@ -116,7 +116,7 @@ rosservice call /global_localization
 
 ## Citation
 
-This repository holds the implementation of CBGL, whose theoretical underpinning and key performance aspects are presented in the following preprint
+The theoretical underpinning, key aspects, and experimental performance of CBGL are presented in the preprint cited through
 
 ```bibtex
 @article{cbgl,
