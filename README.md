@@ -5,7 +5,7 @@
 
 `cbgl` is a ROS package written in C++ that allows you to localise your 2D
 LIDAR sensor in a given 2D map under global uncertainty in position and
-orientation.
+orientation in minimal time.
 
 CBGL does not require motion for performing global localisation: it's a
 one-shot approach that only requires a single laser scan measurement and the
