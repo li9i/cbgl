@@ -52,7 +52,7 @@ Build the image with the most recent code of this repository with:
 
 ```
 git clone git@github.com:li9i/cbgl.git; cd cbgl
-docker build --progress=plain --no-cache -t li9i/cbgl:latest .
+docker compose build
 ```
 
 ### Via traditional means
@@ -85,12 +85,7 @@ Before launching your robot, `cbgl`, etc, you will need to
 ### Via Docker
 
 ```
-docker run -it \
-    --name=cbgl_container \
-    --env="DISPLAY=$DISPLAY" \
-    --net=host \
-    --rm \
-    li9i/cbgl:latest
+docker compose up
 ```
 ### Via traditional means
 

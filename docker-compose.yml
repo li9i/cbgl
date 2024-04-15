@@ -1,0 +1,21 @@
+services:
+
+  cbgl:
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: li9i/cbgl:latest
+
+    container_name: cbgl_container
+
+    stdin_open: true
+    tty: true
+    network_mode: "host"
+    ipc: host
+
+    environment:
+      - DISPLAY=${DISPLAY}
+
+    user: ${USERNAME:-user_cbgl}
