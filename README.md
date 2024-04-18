@@ -44,7 +44,7 @@ If this is your first time running docker then I happen to find [this](https://y
 
 Build the image with the most recent code of this repository with:
 
-```
+```console
 git clone git@github.com:li9i/cbgl.git; cd cbgl
 docker compose build
 ```
@@ -55,7 +55,7 @@ This package was tested and works under Ubuntu 16.04 and ROS kinetic.
 You will need [`csm`](https://github.com/AndreaCensi/csm), `CGAL 4.7`
 and `fftw3` as dependencies. Then, as always
 
-```sh
+```console
 cd ~/catkin_ws/src
 git clone git@github.com:li9i/cbgl.git
 cd cbgl; mv cbgl/* $PWD; rmdir cbgl; cd ../..
@@ -80,14 +80,14 @@ Before launching your robot, `cbgl`, etc, you will need to
 
 #### Via Docker
 
-```
+```console
 docker compose up
 ```
 
 #### Via traditional means
 
 
-```sh
+```console
 roslaunch cbgl cbgl.launch
 ```
 
@@ -97,13 +97,13 @@ Launching `cbgl` simply makes it go into stand-by mode and does not actually exe
 
 #### Via Docker
 
-```sh
+```console
 docker exec -it cbgl_container sh -c "source ~/catkin_ws/devel/setup.bash; rosservice call global_localization"
 ```
 
 #### Via traditional means
 
-```sh
+```console
 rosservice call /global_localization
 ```
 
