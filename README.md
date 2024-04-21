@@ -121,13 +121,13 @@ rosservice call /global_localization
 ## Motivation
 
 <p align="center">
-  <img src="https://i.imgur.com/7eo8v8n.png">
+  <img src="https://i.imgur.com/LQBwg7G.png">
 </p>
 
 ## More results
 
 <p align="center">
-  <img src="https://i.imgur.com/Vb0JHMx.png">
+  <img src="https://i.imgur.com/0qt3chL.png">
 </p>
 
 ## Citation
