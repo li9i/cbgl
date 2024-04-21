@@ -24,6 +24,9 @@ Both times `cbgl` is successful in estimating the sensor's pose. Sensor
 characteristics: $`N_s = 360`$ rays; noise: $`\sim N (0.0, 0.05^2)`$ [m,m$`^2`$]</sub>
 
 
+## Why use CBGL
+
+![CSAL AUTh experiments](https://i.imgur.com/IdJRiFc.png)
 
 
 
@@ -113,6 +116,13 @@ rosservice call /global_localization
 - [out] A `geometry_msgs/PoseWithCovarianceStamped` message published through topic `configuration_files/output_pose_topic`
 - [out] The transform between the `odom` frame and the `map` frame if `configuration_files/tf_broadcast` is set to `true`
 
+## Motivation
+
+![Motivation](https://i.imgur.com/qqJruIr.png)
+
+## More experiments
+
+![More experiments](https://i.imgur.com/wcYn4k9.png)
 
 ## Citation
 
