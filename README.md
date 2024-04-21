@@ -27,7 +27,7 @@ characteristics: $`N_s = 360`$ rays; noise: $`\sim N (0.0, 0.05^2)`$ [m,m$`^2`$]
 ## Why use CBGL
 
 <p align="center">
-  <img src="https://i.imgur.com/aGHk9TV.png">
+  <img src="https://i.imgur.com/yHkrXg6.png">
 </p>
 
 
