@@ -27,7 +27,7 @@ characteristics: $`N_s = 360`$ rays; noise: $`\sim N (0.0, 0.05^2)`$ [m,m$`^2`$]
 ## Why use CBGL
 
 <p align="center">
-  <img src="https://i.imgur.com/IdJRiFc.png">
+  <img style='height: 80%; width: 80%; object-fit: contain' src="https://i.imgur.com/aGHk9TV.png">
 </p>
 
 
@@ -121,13 +121,13 @@ rosservice call /global_localization
 ## Motivation
 
 <p align="center">
-  <img src="https://i.imgur.com/qqJruIr.png">
+  <img src="https://i.imgur.com/7eo8v8n.png">
 </p>
 
 ## More results
 
 <p align="center">
-  <img src="https://i.imgur.com/wcYn4k9.png">
+  <img src="https://i.imgur.com/Vb0JHMx.png">
 </p>
 
 ## Citation
