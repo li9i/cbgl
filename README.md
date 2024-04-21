@@ -26,7 +26,9 @@ characteristics: $`N_s = 360`$ rays; noise: $`\sim N (0.0, 0.05^2)`$ [m,m$`^2`$]
 
 ## Why use CBGL
 
-![CSAL AUTh experiments](https://i.imgur.com/IdJRiFc.png)
+<p align="center">
+  <img src="https://i.imgur.com/IdJRiFc.png">
+</p>
 
 
 
@@ -118,11 +120,15 @@ rosservice call /global_localization
 
 ## Motivation
 
-![Motivation](https://i.imgur.com/qqJruIr.png)
+<p align="center">
+  <img src="https://i.imgur.com/qqJruIr.png">
+</p>
 
-## More experiments
+## More results
 
-![More experiments](https://i.imgur.com/wcYn4k9.png)
+<p align="center">
+  <img src="https://i.imgur.com/wcYn4k9.png">
+</p>
 
 ## Citation
 
