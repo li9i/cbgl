@@ -56,6 +56,19 @@ git clone git@github.com:li9i/cbgl.git; cd cbgl
 docker compose build
 ```
 
+or pull the docker image and run it with
+
+```sh
+docker pull li9i/cbgl
+
+docker run -it \
+    --name=cbgl_container \
+    --env="DISPLAY=$DISPLAY" \
+    --net=host \
+    --rm \
+    li9i/cbgl:latest
+```
+
 #### Via traditional means
 
 This package was tested and works under Ubuntu 16.04 and ROS kinetic.
