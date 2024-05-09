@@ -59,7 +59,7 @@ docker compose build
 or pull the docker image and run it with
 
 ```sh
-docker pull li9i/cbgl
+docker pull li9i/cbgl:latest
 
 docker run -it \
     --name=cbgl_container \
