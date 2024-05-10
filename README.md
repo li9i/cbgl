@@ -52,7 +52,8 @@ If this is your first time running docker then I happen to find [this](https://y
 Build the image with the most recent code of this repository with:
 
 ```sh
-git clone git@github.com:li9i/cbgl.git; cd cbgl
+git clone git@github.com:li9i/cbgl.git
+cd cbgl
 docker compose build
 ```
 
