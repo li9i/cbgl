@@ -3,7 +3,7 @@
 [![arxiv.org](http://img.shields.io/badge/cs.RO-arXiv%3A2307.14247-B31B1B.svg)](https://arxiv.org/abs/2307.14247) [![youtube.com](https://img.shields.io/badge/2'_presentation-YouTube-FF0000)](https://www.youtube.com/watch?v=xaDKjI0WkDc)
 
 
-`cbgl` is a ROS package written in C++ that allows you to localise your 2D LIDAR sensor in a given 2D map under global uncertainty in position and orientation in minimal time
+`cbgl` is a ROS package written in C++ that allows you to localise your 2D LIDAR sensor in a given 2D occupancy grid map under global uncertainty in position and orientation in minimal time
 
 - You can expect the execution time to roughly have an order of magnitude of $`10e \cdot \text{area} \cdot N_s`$ microseconds, where $\text{area}$ is the area of the map's free space and $`N_s`$ is the LIDAR's number of rays. (Strictly speaking the execution time varies according to the geometry of the environment and other factors.) In the video below the environment area is $`2000`$ m$`^2`$ and localisation is performed in under four seconds
 
