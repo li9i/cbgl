@@ -135,7 +135,7 @@ CBGL::CBGL(
       &CBGL::startSignalService, this);
 
   // Re-set the map png file
-  omap_ = ranges::OMap(map_png_file_);
+  //omap_ = ranges::OMap(map_png_file_);
 
   ROS_INFO("[CBGL] BORN READY");
 }
@@ -282,6 +282,87 @@ CBGL::convertMap(const nav_msgs::OccupancyGrid& map_msg)
   }
 
   return map;
+}
+
+
+/*******************************************************************************
+*/
+std::vector<unsigned char> CBGL::convertMapToPNG(
+  const nav_msgs::OccupancyGrid& map_msg)
+{
+  unsigned int width = map_msg.info.width;
+  unsigned int height = map_msg.info.height;
+
+  /*
+  for (size_t i = 0; i < map_msg.data.size(); i++)
+    ROS_ERROR("%d", map_msg.data[i]);
+
+  const std::string pngFilename = "/home/user_cbgl/catkin_ws/src/cbgl/map/gray.png";
+  std::vector<uint8_t> image;
+  lodepng::decode(image, width, height, pngFilename);
+
+  for (size_t i = 0; i < map_msg.data.size(); i=i+4)
+    std::cout << "First pixel value (R, G, B, A): ("
+      << static_cast<int>(image[i+0]) << ", "
+      << static_cast<int>(image[i+1]) << ", "
+      << static_cast<int>(image[i+2]) << ", "
+      << static_cast<int>(image[i+3]) << ")" << std::endl;
+  */
+
+  std::vector<uint8_t> converted(4*map_msg.data.size());
+  unsigned int ic = 0;
+  for (size_t i = 0; i < map_msg.data.size(); i++)
+  {
+    // black
+    if (map_msg.data[i] == 100)
+    {
+      converted[ic+0] = 0;
+      converted[ic+1] = 0;
+      converted[ic+2] = 0;
+      converted[ic+3] = 255;
+    }
+
+    // white
+    if (map_msg.data[i] == 0)
+    {
+      converted[ic+0] = 254;
+      converted[ic+1] = 254;
+      converted[ic+2] = 254;
+      converted[ic+3] = 255;
+    }
+
+    // gray
+    if (map_msg.data[i] == -1)
+    {
+      converted[ic+0] = 205;
+      converted[ic+1] = 205;
+      converted[ic+2] = 205;
+      converted[ic+3] = 255;
+    }
+    ic += 4;
+  }
+
+  unsigned rowSize = width * 4; // 4 bytes per pixel (RGBA)
+  std::vector<uint8_t> tempRow(rowSize);
+  for (unsigned y = 0; y < height / 2; ++y)
+  {
+    uint8_t* topRow = &converted[y * rowSize];
+    uint8_t* bottomRow = &converted[(height - 1 - y) * rowSize];
+    std::copy(bottomRow, bottomRow + rowSize, tempRow.begin());
+    std::copy(topRow, topRow + rowSize, bottomRow);
+    std::copy(tempRow.begin(), tempRow.end(), topRow);
+  }
+
+
+
+
+  std::vector<uint8_t> png;
+  unsigned error = lodepng::encode(png, converted, width, height, LCT_RGBA, 8);
+  if (error)
+    throw std::runtime_error("Error encoding PNG: " + std::string(lodepng_error_text(error)));
+
+  unsigned int k = lodepng::save_file(png, "/home/user_cbgl/catkin_ws/src/cbgl/map/image.png");
+  ROS_ERROR("%d",k);
 }
 
 
@@ -1469,6 +1550,9 @@ CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
   map_res_ = map_.info.resolution;
   map_hgt_ = map_.info.height;
 
+  //convertMapToPNG(map_msg, map_png_file_);
+  convertMapToPNG(map_msg);
+
   received_map_ = true;
   if (received_scan_ && received_pose_cloud_ && received_start_signal_)
     processPoseCloud();
@@ -1587,12 +1671,18 @@ void CBGL::processPoseCloud()
   // Construct the 3rd-party ray-casters AFTER both a scan and the map is
   // received
   bool cond = received_scan_         &&
-              received_pose_cloud_   &&
-              received_start_signal_ &&
-              received_map_;
+    received_pose_cloud_   &&
+    received_start_signal_ &&
+    received_map_;
 
   if (!cond)
     return;
+
+
+
+  // Re-set the map png file
+  //omap_ = ranges::OMap(map_png_file_);
+  omap_ = ranges::OMap("/home/user_cbgl/catkin_ws/src/cbgl/map/image.png");
 
   // Init raycasters with laser details
   initRangeLibRayCasters();

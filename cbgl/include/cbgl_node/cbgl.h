@@ -80,6 +80,7 @@
 #undef max
 
 #include "utils/range_libc/includes/RangeLib.h"
+#include "utils/range_libc/vendor/lodepng/lodepng.h"
 #include "utils/occupancy_grid_utils/ray_tracer.h"
 
 
@@ -275,6 +276,13 @@ class CBGL
      * representation. This allocates a map_t and returns it. Stolen from amcl.
      */
     map_t* convertMap(const nav_msgs::OccupancyGrid& map_msg);
+
+
+    /*****************************************************************************
+     * @brief Convert an OccupancyGrid map message into a PNG image
+     */
+    std::vector<unsigned char> convertMapToPNG(
+      const nav_msgs::OccupancyGrid& map_msg);
 
     /*****************************************************************************
      * @brief Copies a source LDP structure to a target one.
