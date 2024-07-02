@@ -2407,8 +2407,14 @@ CBGL::startSignalService(
   std_srvs::Empty::Request& req,
   std_srvs::Empty::Response& res)
 {
-  while(received_start_signal_)
-    ros::Duration(0.1).sleep();
+  while (received_start_signal_)
+    ros::Duration(1).sleep();
+
+  if (!received_map_)
+  {
+    ROS_WARN("[CBGL] Map not received yet, returning ...");
+    return false;
+  }
 
   ROS_INFO("--------------------------------------------------------------------------");
   ROS_INFO("[CBGL] Initializing with uniform distribution over map");
