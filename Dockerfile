@@ -49,5 +49,4 @@ RUN chmod +x /home/user_cbgl/cbgl_launch.sh
 
 USER root
 
-#ENTRYPOINT bash /home/user_cbgl/cbgl_launch.sh
-CMD "/bin/bash"
+ENTRYPOINT bash /home/user_cbgl/cbgl_launch.sh
