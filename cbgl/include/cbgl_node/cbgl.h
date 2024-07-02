@@ -258,7 +258,7 @@ class CBGL
       const geometry_msgs::Pose& pose);
 
     /*****************************************************************************
-     */
+    */
     double caer(const sensor_msgs::LaserScan::Ptr& sr,
       const sensor_msgs::LaserScan::Ptr& sv);
     double caer(const std::vector<float>& sr,
@@ -278,14 +278,26 @@ class CBGL
 
 
     /*****************************************************************************
-     * @brief Convert an OccupancyGrid map message into a PNG image
+     * @brief Convert an OccupancyGrid map message into a unsigned char* array.
+     * If this array is immediately inputted to lodepng::encode the latter
+     * returns 0.
+     * @param[in] map_msg [const nav_msgs::OccupancyGrid&] The map message to be
+     * converted.
+     * @param[out] converted [unsigned char*] The output array
+     * @ return void
      */
     void convertMapToPNG(
       const nav_msgs::OccupancyGrid& map_msg,
       unsigned char* converted);
 
     /*****************************************************************************
-     * @brief Convert an OccupancyGrid map message into a PNG image and store it
+     * @brief Convert an OccupancyGrid map message into a unsigned char* array,
+     * encode it into PNG, and store the image to file.
+     * @param[in] map_msg [const nav_msgs::OccupancyGrid&] The map message to be
+     * converted to png
+     * @param[in] filename [const std::string&] The name of the png file to be
+     * stored
+     * @ return void
      */
     void convertMapToPNG(
       const nav_msgs::OccupancyGrid& map_msg,
