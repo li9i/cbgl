@@ -134,9 +134,6 @@ CBGL::CBGL(
     nh_.advertiseService(global_localisation_service_name_,
       &CBGL::startSignalService, this);
 
-  // Re-set the map png file
-  //omap_ = ranges::OMap(map_png_file_);
-
   ROS_INFO("[CBGL] BORN READY");
 }
 
@@ -285,17 +282,17 @@ CBGL::convertMap(const nav_msgs::OccupancyGrid& map_msg)
 }
 
 
+
 /*******************************************************************************
-  @brief Converts a nav_msgs::OccupancyGrid to a png image and saves it to disc
+* @brief Convert an OccupancyGrid map message into a PNG image
 */
-std::vector<unsigned char> CBGL::convertMapToPNG(
+void CBGL::convertMapToPNG(
   const nav_msgs::OccupancyGrid& map_msg,
-  const std::string& filename)
+  unsigned char* converted)
 {
   unsigned int width = map_msg.info.width;
   unsigned int height = map_msg.info.height;
 
-  std::vector<uint8_t> converted(4*map_msg.data.size());
   unsigned int ic = 0;
   for (size_t i = 0; i < map_msg.data.size(); i++)
   {
@@ -339,8 +336,21 @@ std::vector<unsigned char> CBGL::convertMapToPNG(
     std::copy(top_row, top_row + row_size, bottom_row);
     std::copy(temp_row.begin(), temp_row.end(), top_row);
   }
+}
+
+/*******************************************************************************
+ * @brief Convert an OccupancyGrid map message into a PNG image and store it
+*/
+void CBGL::convertMapToPNG(
+  const nav_msgs::OccupancyGrid& map_msg,
+  const std::string& filename)
+{
+  unsigned char converted[4*map_msg.data.size()];
+  convertMapToPNG(map_msg, converted);
 
   // Store png to disc
+  unsigned int width = map_msg.info.width;
+  unsigned int height = map_msg.info.height;
   std::vector<uint8_t> png;
   unsigned error = lodepng::encode(png, converted, width, height, LCT_RGBA, 8);
   if (error)
@@ -1134,12 +1144,6 @@ CBGL::initParams()
   if (!nh_private_.getParam ("initial_cov_aa", initial_cov_aa_))
     initial_cov_aa_ = 0.06854;
 
-  if (!nh_private_.getParam("map_png_file", map_png_file_))
-  {
-    map_png_file_ = "";
-    ROS_ERROR("[CBGL] map_png_file");
-  }
-
   if (!nh_private_.getParam("do_icp", do_icp_))
   {
     do_icp_ = true;
@@ -1535,8 +1539,10 @@ CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
   map_res_ = map_.info.resolution;
   map_hgt_ = map_.info.height;
 
-  map_png_file_ = "/home/user_cbgl/catkin_ws/src/cbgl/map/image.png";
-  convertMapToPNG(map_msg, map_png_file_);
+  // Re-set the map png file
+  unsigned char converted[4*map_msg.data.size()];
+  convertMapToPNG(map_msg, converted);
+  omap_ = ranges::OMap(converted);
 
   received_map_ = true;
   if (received_scan_ && received_pose_cloud_ && received_start_signal_)
@@ -1662,12 +1668,6 @@ void CBGL::processPoseCloud()
 
   if (!cond)
     return;
-
-
-
-  // Re-set the map png file
-  //omap_ = ranges::OMap(map_png_file_);
-  omap_ = ranges::OMap("/home/user_cbgl/catkin_ws/src/cbgl/map/image.png");
 
   // Init raycasters with laser details
   initRangeLibRayCasters();

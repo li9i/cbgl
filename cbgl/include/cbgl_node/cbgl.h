@@ -225,7 +225,6 @@ class CBGL
 
     // The map converted to a suitable structure for 3rd-party lib ray-casting
     ranges::OMap omap_;
-    std::string map_png_file_;
 
     // 3rd-party ray-casters (range_libc)
     ranges::RayMarching rm_;
@@ -281,7 +280,14 @@ class CBGL
     /*****************************************************************************
      * @brief Convert an OccupancyGrid map message into a PNG image
      */
-    std::vector<unsigned char> convertMapToPNG(
+    void convertMapToPNG(
+      const nav_msgs::OccupancyGrid& map_msg,
+      unsigned char* converted);
+
+    /*****************************************************************************
+     * @brief Convert an OccupancyGrid map message into a PNG image and store it
+     */
+    void convertMapToPNG(
       const nav_msgs::OccupancyGrid& map_msg,
       const std::string& filename);
 
