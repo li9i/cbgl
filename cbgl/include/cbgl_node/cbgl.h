@@ -282,7 +282,8 @@ class CBGL
      * @brief Convert an OccupancyGrid map message into a PNG image
      */
     std::vector<unsigned char> convertMapToPNG(
-      const nav_msgs::OccupancyGrid& map_msg);
+      const nav_msgs::OccupancyGrid& map_msg,
+      const std::string& filename);
 
     /*****************************************************************************
      * @brief Copies a source LDP structure to a target one.

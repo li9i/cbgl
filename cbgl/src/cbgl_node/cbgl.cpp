@@ -286,28 +286,14 @@ CBGL::convertMap(const nav_msgs::OccupancyGrid& map_msg)
 
 
 /*******************************************************************************
+  @brief Converts a nav_msgs::OccupancyGrid to a png image and saves it to disc
 */
 std::vector<unsigned char> CBGL::convertMapToPNG(
-  const nav_msgs::OccupancyGrid& map_msg)
+  const nav_msgs::OccupancyGrid& map_msg,
+  const std::string& filename)
 {
   unsigned int width = map_msg.info.width;
   unsigned int height = map_msg.info.height;
-
-  /*
-  for (size_t i = 0; i < map_msg.data.size(); i++)
-    ROS_ERROR("%d", map_msg.data[i]);
-
-  const std::string pngFilename = "/home/user_cbgl/catkin_ws/src/cbgl/map/gray.png";
-  std::vector<uint8_t> image;
-  lodepng::decode(image, width, height, pngFilename);
-
-  for (size_t i = 0; i < map_msg.data.size(); i=i+4)
-    std::cout << "First pixel value (R, G, B, A): ("
-      << static_cast<int>(image[i+0]) << ", "
-      << static_cast<int>(image[i+1]) << ", "
-      << static_cast<int>(image[i+2]) << ", "
-      << static_cast<int>(image[i+3]) << ")" << std::endl;
-  */
 
   std::vector<uint8_t> converted(4*map_msg.data.size());
   unsigned int ic = 0;
@@ -342,27 +328,26 @@ std::vector<unsigned char> CBGL::convertMapToPNG(
     ic += 4;
   }
 
-  unsigned rowSize = width * 4; // 4 bytes per pixel (RGBA)
-  std::vector<uint8_t> tempRow(rowSize);
+  // Flip y axis
+  unsigned row_size = width * 4; // 4 bytes per pixel (RGBA)
+  std::vector<uint8_t> temp_row(row_size);
   for (unsigned y = 0; y < height / 2; ++y)
   {
-    uint8_t* topRow = &converted[y * rowSize];
-    uint8_t* bottomRow = &converted[(height - 1 - y) * rowSize];
-    std::copy(bottomRow, bottomRow + rowSize, tempRow.begin());
-    std::copy(topRow, topRow + rowSize, bottomRow);
-    std::copy(tempRow.begin(), tempRow.end(), topRow);
+    uint8_t* top_row = &converted[y * row_size];
+    uint8_t* bottom_row = &converted[(height-1- y) * row_size];
+    std::copy(bottom_row, bottom_row + row_size, temp_row.begin());
+    std::copy(top_row, top_row + row_size, bottom_row);
+    std::copy(temp_row.begin(), temp_row.end(), top_row);
   }
 
-
-
-
+  // Store png to disc
   std::vector<uint8_t> png;
   unsigned error = lodepng::encode(png, converted, width, height, LCT_RGBA, 8);
   if (error)
-    throw std::runtime_error("Error encoding PNG: " + std::string(lodepng_error_text(error)));
+    throw std::runtime_error("Error encoding PNG: " +
+      std::string(lodepng_error_text(error)));
 
-  unsigned int k = lodepng::save_file(png, "/home/user_cbgl/catkin_ws/src/cbgl/map/image.png");
-  ROS_ERROR("%d",k);
+  error = lodepng::save_file(png, filename);
 }
 
 
@@ -1550,8 +1535,8 @@ CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
   map_res_ = map_.info.resolution;
   map_hgt_ = map_.info.height;
 
-  //convertMapToPNG(map_msg, map_png_file_);
-  convertMapToPNG(map_msg);
+  map_png_file_ = "/home/user_cbgl/catkin_ws/src/cbgl/map/image.png";
+  convertMapToPNG(map_msg, map_png_file_);
 
   received_map_ = true;
   if (received_scan_ && received_pose_cloud_ && received_start_signal_)
