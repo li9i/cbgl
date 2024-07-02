@@ -161,6 +161,13 @@ namespace ranges {
 			unsigned char* image;
 
 			error = lodepng_decode32_file(&image, &width, &height, filename.c_str());
+      OMap(image, threshold);
+		}
+
+		OMap(unsigned char* image) : OMap(image, 128) {}
+		OMap(unsigned char* image, float threshold) : has_error(false) {
+			unsigned error;
+
 			if(error) {
 				printf("ERROR %u: %s\n", error, lodepng_error_text(error));
 				has_error = true;
@@ -198,7 +205,7 @@ namespace ranges {
 					raw_grid[x][y] = gray;
 				}
 			}
-		}
+    }
 
 		bool get(int x, int y) { return grid[x][y]; }
 		bool isOccupied(int x, int y) {
