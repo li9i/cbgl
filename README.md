@@ -145,6 +145,7 @@ The theoretical underpinning, key aspects, and experimental performance of CBGL 
   journal={arXiv:2307.14247},
   url={https://arxiv.org/abs/2307.14247}
   year={2023}}
+```
 
 ## Acknowledgements
 
