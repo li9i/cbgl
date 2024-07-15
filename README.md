@@ -145,3 +145,7 @@ The theoretical underpinning, key aspects, and experimental performance of CBGL 
   journal={arXiv:2307.14247},
   url={https://arxiv.org/abs/2307.14247}
   year={2023}}
+
+## Acknowledgements
+
+The paper behind this code was written under the influence of [Cigarettes After Sex Live at AB - Ancienne Belgique](https://www.youtube.com/watch?v=W9Wjh3bOIjw)
