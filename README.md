@@ -75,13 +75,9 @@ docker run -it \
 
 ### Launch
 
-#### Via Docker
-
 ```sh
 docker compose up
 ```
-
-
 
 ### Call
 
@@ -90,6 +86,10 @@ Launching `cbgl` simply makes it go into stand-by mode and does not actually exe
 ```sh
 docker exec -it cbgl_container sh -c "source ~/catkin_ws/devel/setup.bash; rosservice call global_localization"
 ```
+
+
+
+*If instead you wish to install and run the package natively in Ubuntu 16.04, see the [[INSTALLATION_DEPRECATED.md](https://github.com/li9i/cbgl/blob/master/INSTALLATION_DEPRECATED.md)] guide.
 
 
 
