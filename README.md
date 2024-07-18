@@ -43,9 +43,8 @@ Table of Contents
 * [More results](#more-results)
 
 
-## Install
 
-#### Via Docker
+## Install
 
 If this is your first time running docker then I happen to find [this](https://youtu.be/SAMPOK_lazw?t=67) docker installation guide very friendly and easy to follow.
 
@@ -70,18 +69,7 @@ docker run -it \
     li9i/cbgl:latest
 ```
 
-#### Via traditional means
 
-This package was tested and works under Ubuntu 16.04 and ROS kinetic.
-You will need [`csm`](https://github.com/AndreaCensi/csm), `CGAL 4.7`
-and `fftw3` as dependencies. Then, as always
-
-```sh
-cd ~/catkin_ws/src
-git clone git@github.com:li9i/cbgl.git
-cd cbgl; mv cbgl/* $PWD; rmdir cbgl; cd ../..
-catkin build cbgl
-```
 
 ## Run
 
@@ -93,30 +81,20 @@ catkin build cbgl
 docker compose up
 ```
 
-#### Via traditional means
 
-
-```sh
-roslaunch cbgl cbgl.launch
-```
 
 ### Call
 
 Launching `cbgl` simply makes it go into stand-by mode and does not actually execute global localisation. To do so simply call the provided service
 
-#### Via Docker
-
 ```sh
 docker exec -it cbgl_container sh -c "source ~/catkin_ws/devel/setup.bash; rosservice call global_localization"
 ```
 
-#### Via traditional means
 
-```sh
-rosservice call /global_localization
-```
 
 ## Input/output at a glance
+
 - [in]  A `sensor_msgs/LaserScan` message published through topic `configuration_files/scan_topic`
 - [in]  A `nav_msgs/OccupancyGrid` message published through topic `configuration_files/map_topic`
 - [out] A `geometry_msgs/PoseWithCovarianceStamped` message published through topic `configuration_files/output_pose_topic`
