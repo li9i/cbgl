@@ -34,6 +34,7 @@ characteristics: $`N_s = 360`$ rays; noise: $`\sim \mathcal{N} (0.0, 0.05^2)`$ [
 
 Table of Contents
 =================
+* [Pre-installation](#pre-installation)
 * [Install](#install)
 * [Run](#run)
   * [Launch](#launch)
@@ -44,9 +45,16 @@ Table of Contents
 
 
 
-## Install
+## Pre-installation
 
-If this is your first time running docker then I happen to find [this](https://youtu.be/SAMPOK_lazw?t=67) docker installation guide very friendly and easy to follow. If instead you wish to install and run the package natively in Ubuntu 16.04, see the [INSTALLATION_DEPRECATED.md](https://github.com/li9i/cbgl/blob/master/INSTALLATION_DEPRECATED.md) guide.
+`cbgl` is installed, launched, and called via Docker:
+
+- if this is your first time running docker then I happen to find [this](https://youtu.be/SAMPOK_lazw?t=67) docker installation guide very friendly and easy to follow
+- if instead you wish to install and run the package natively in Ubuntu 16.04, see the [INSTALLATION_DEPRECATED.md](https://github.com/li9i/cbgl/blob/master/INSTALLATION_DEPRECATED.md) guide.
+
+
+
+## Install
 
 Build the image with the most recent code of this repository with:
 
