@@ -62,8 +62,7 @@ or pull the docker image and run it with
 docker pull li9i/cbgl:latest
 
 docker run -it \
-    --name=cbgl_container \
-    --env="DISPLAY=$DISPLAY" \
+    --name=container_cbgl \
     --net=host \
     --rm \
     li9i/cbgl:latest
