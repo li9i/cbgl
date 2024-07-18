@@ -46,7 +46,7 @@ Table of Contents
 
 ## Install
 
-If this is your first time running docker then I happen to find [this](https://youtu.be/SAMPOK_lazw?t=67) docker installation guide very friendly and easy to follow.
+If this is your first time running docker then I happen to find [this](https://youtu.be/SAMPOK_lazw?t=67) docker installation guide very friendly and easy to follow. If instead you wish to install and run the package natively in Ubuntu 16.04, see the [INSTALLATION_DEPRECATED.md](https://github.com/li9i/cbgl/blob/master/INSTALLATION_DEPRECATED.md) guide.
 
 Build the image with the most recent code of this repository with:
 
@@ -86,10 +86,6 @@ Launching `cbgl` simply makes it go into stand-by mode and does not actually exe
 ```sh
 docker exec -it cbgl_container sh -c "source ~/catkin_ws/devel/setup.bash; rosservice call global_localization"
 ```
-
-
-
-*If instead you wish to install and run the package natively in Ubuntu 16.04, see the [[INSTALLATION_DEPRECATED.md](https://github.com/li9i/cbgl/blob/master/INSTALLATION_DEPRECATED.md)] guide.
 
 
 
