@@ -127,3 +127,7 @@ The theoretical underpinning, key aspects, and experimental performance of CBGL 
   url={https://arxiv.org/abs/2307.14247}
   year={2023}}
 ```
+
+Update JUN 2024: CBGL has been accepted for publication in the Proceedings of
+the 2024 IEEE/RSJ International Conference on Intelligent Robots and Systems
+(IROS 2024)
