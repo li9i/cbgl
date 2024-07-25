@@ -46,6 +46,9 @@ do_undersample_scan: true
 undersample_rate: 1
 
 # global pose retrieval method (do_icp AND do_fmt should equal FALSE).
-# fsm works only with panoramic sensors; icp does not discriminate
+# fsm works only with panoramic sensors; icp does not discriminate.
+# After setting these two values make sure to edit either `params_fsm.yaml`
+# or `params_csm.yaml` for setting the scan--to--map-scan matching parameters
+# specific to each algorithm
 do_icp: true
 do_fsm: false
