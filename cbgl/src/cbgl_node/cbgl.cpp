@@ -1,42 +1,3 @@
-/*
- * Copyright (c) 2011, Ivan Dryanovski, William Morris
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the CCNY Robotics Lab nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/*  This package uses Canonical Scan Matcher [1], written by
- *  Andrea Censi
- *  Code adopted and adapted from
- *  https://github.com/ccny-ros-pkg/scan_tools/tree/indigo/laser_scan_matcher
- *
- *  [1] A. Censi, "An ICP variant using a point-to-line metric"
- *  Proceedings of the IEEE International Conference
- *  on Robotics and Automation (ICRA), 2008
- */
-
 #include <boost/assign.hpp>
 #include <pcl_conversions/pcl_conversions.h>
 #include <cbgl_node/cbgl.h>
@@ -79,7 +40,7 @@ CBGL::CBGL(
 
   // **** publishers
 
-  // The  global pose result is fed-back to amcl through this publisher
+  // The result
   global_pose_publisher_ =
     nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>(
       output_pose_topic_, 1);
@@ -89,10 +50,12 @@ CBGL::CBGL(
     nh_.advertise<std_msgs::Duration>(
       ros::this_node::getName() + "/execution_time", 10);
 
+  // Publisher of the id of the best hypothesis
   best_particle_publisher_ =
     nh_.advertise<std_msgs::UInt64>(
       ros::this_node::getName() + "/best_particle", 10);
 
+  // Self-described; for debugging/analysis purposes
   all_hypotheses_publisher_ =
     nh_.advertise<geometry_msgs::PoseArray>(
       ros::this_node::getName() + "/particlecloud_all",
@@ -115,10 +78,6 @@ CBGL::CBGL(
     nh_.advertise<sensor_msgs::LaserScan>(
       ros::this_node::getName() + "/map_scan", 1);
 
-  // Status: busy or not
-  status_publisher_ = nh_.advertise<std_msgs::UInt64>(
-    ros::this_node::getName() + "/status", 10, true);
-
   // *** subscribers
 
   // This is the map
@@ -137,7 +96,6 @@ CBGL::CBGL(
   ROS_INFO("[CBGL] BORN READY");
 }
 
-
 /*******************************************************************************
  * @brief Destructor
  * @params void
@@ -146,7 +104,6 @@ CBGL::~CBGL()
 {
   ROS_INFO("[CBGL] Destroying CBGL");
 }
-
 
 /*****************************************************************************
  * @brief Broadcasts the estimated pose as the odom<--map transform
@@ -188,7 +145,6 @@ void CBGL::broadcast_global_pose_tf(
       fixed_frame_id_, odom_frame_id_));
 }
 
-
 /*******************************************************************************
 */
 double CBGL::caer(
@@ -204,7 +160,6 @@ double CBGL::caer(
 
   return c;
 }
-
 
 /*******************************************************************************
 */
@@ -247,8 +202,6 @@ CBGL::cacheFFTW3Plans(const unsigned int& sz)
   c2rp_ = fftw_plan_dft_c2r_1d(sz, c2r_in, c2r_out, FFTW_MEASURE);
 }
 
-
-
 /*******************************************************************************
  * @brief Convert an OccupancyGrid map message into the internal
  * representation. This allocates a map_t and returns it. Stolen from amcl.
@@ -280,8 +233,6 @@ CBGL::convertMap(const nav_msgs::OccupancyGrid& map_msg)
 
   return map;
 }
-
-
 
 /*******************************************************************************
 * @brief Convert an OccupancyGrid map message into a unsigned char* array.
@@ -370,7 +321,6 @@ void CBGL::convertMapToPNG(
   error = lodepng::save_file(png, filename);
 }
 
-
 /*******************************************************************************
  * @brief Copies a source LDP structure to a target one.
  * @param[in] source [const LDP&] The source structure
@@ -440,7 +390,6 @@ CBGL::copyMetaDataLDP(
   target->true_pose[2] = source->true_pose[2];
 }
 
-
 /*******************************************************************************
  * @brief This function uses the csm_icp result for correcting the amcl pose.
  * Given the icp output, this function express this correction in the
@@ -475,7 +424,6 @@ CBGL::correctICPPose(
   }
 }
 
-
 /*******************************************************************************
  * @brief Creates a transform from a 2D pose (x,y,theta)
  * @param[in] x [const double&] The x-wise coordinate of the pose
@@ -496,7 +444,6 @@ CBGL::createTfFromXYTheta(
   q.normalize();
   t.setRotation(q);
 }
-
 
 /*******************************************************************************
  * @brief Given the amcl pose and a world scan, this function corrects
@@ -572,7 +519,6 @@ CBGL::doFSM(
 #endif
 }
 
-
 /*******************************************************************************
  * @brief Given the amcl pose and a world scan, this function corrects
  * the pose by ICP-ing the world scan and a map scan taken at the amcl pose
@@ -626,7 +572,6 @@ CBGL::doICP(
 #endif
 }
 
-
 /*******************************************************************************
  * @brief Extracts the yaw component from the input pose's quaternion.
  * @param[in] pose [const geometry_msgs::Pose&] The input pose
@@ -649,7 +594,6 @@ CBGL::extractYawFromPose(const geometry_msgs::Pose& pose)
 
   return yaw;
 }
-
 
 /*******************************************************************************
 */
@@ -696,8 +640,6 @@ CBGL::dumpScan(const LDP& real_scan, const LDP& virtual_scan)
     printf("[CBGL] Could not log scans\n");
 }
 
-
-
 /*******************************************************************************
  * @brief Calculates the area of the free space of a map
  * @param[in] map [map_t*] Guess what
@@ -719,7 +661,6 @@ CBGL::freeArea(map_t* map)
 
   return area;
 }
-
 
 /*******************************************************************************
  * @brief Finds the transform between the laser frame and the base frame
@@ -755,7 +696,6 @@ CBGL::getBaseToLaserTf(const std::string& frame_id)
   return true;
 }
 
-
 /*******************************************************************************
  * @brief Given the robot's pose in the map frame, this function returns the
  * laser's pose in the map frame.
@@ -780,7 +720,6 @@ CBGL::getCurrentLaserPose(const geometry_msgs::Pose& robot_pose)
   // Return the laser's pose
   return laser_pose;
 }
-
 
 /*******************************************************************************
  * @brief This is where all the magic happens
@@ -827,7 +766,6 @@ CBGL::handleInputPose(const geometry_msgs::Pose::Ptr& pose_msg,
   // GUARD stand-down
   running_ = false;
 }
-
 
 /*******************************************************************************
  * @brief Initializes parameters
@@ -1247,7 +1185,6 @@ CBGL::initParams()
   assert(undersample_rate_ >= 0);
 }
 
-
 /*******************************************************************************
  * @brief Initialises the ray-casters from the RangeLib library. Since they
  * take as arguments the maximum range of the lidar and the resolution of the
@@ -1271,7 +1208,6 @@ void CBGL::initRangeLibRayCasters()
   if (map_scan_method_.compare("cddt") == 0)
     cddt_ = ranges::CDDTCast(omap_, max_range_rc, 720);
 }
-
 
 /*******************************************************************************
  * Identify contiguous regions of false measurements
@@ -1384,7 +1320,6 @@ std::vector<float> CBGL::interpolateRanges(
   return ranges_interp;
 }
 
-
 /*******************************************************************************
  * @brief Converts a LaserScan laser scan to a LDP structure.
  * @param[in] scan_msg [const sensor_msgs::LaserScan::Ptr&] The input scan
@@ -1483,8 +1418,6 @@ CBGL::ldp2points(
   }
 }
 
-
-
 /*******************************************************************************
  * @brief Converts a LDP structure to a LaserScan laser scan
  * @param[in] ldp [const LDP&] The input LDP laser scan
@@ -1516,7 +1449,6 @@ CBGL::ldpTolaserScan(const LDP& ldp)
 
   return laser_scan;
 }
-
 
 /*******************************************************************************
  * @brief Stores the map upon receipt. (The map does not change through time)
@@ -1559,7 +1491,6 @@ CBGL::mapCallback(const nav_msgs::OccupancyGrid& map_msg)
     processPoseCloud();
 }
 
-
 /*******************************************************************************
  * @brief Publishes the pipeline's latest execution time.
  * @param[in] start [const ros::Time&] The start time of the pipeline's
@@ -1576,7 +1507,6 @@ CBGL::measureExecutionTime(
   duration_msg.data = d;
   execution_time_publisher_.publish(duration_msg);
 }
-
 
 /*******************************************************************************
  * @brief Checks if there are nan's in an input pose.
@@ -1597,7 +1527,6 @@ CBGL::nanInPose(
   else
     return false;
 }
-
 
 /*******************************************************************************
  * @brief Returns the number of rays that correspond to an angle range
@@ -1627,7 +1556,6 @@ CBGL::numRaysFromAngleRange(
   else
     return ceil(v);
 }
-
 
 /*******************************************************************************
  * @brief The amcl cloud pose callback. This is the point of entry
@@ -1659,7 +1587,6 @@ CBGL::poseCloudCallback(
   if (received_scan_ && received_map_ && received_start_signal_)
     processPoseCloud();
 }
-
 
 /*******************************************************************************
  * @brief
@@ -1821,7 +1748,6 @@ void CBGL::processPoseCloud()
   received_start_signal_ = false;
 }
 
-
 /*******************************************************************************
  * @brief The champion function of the ICP operation.
  * @param[in] world_scan_ldp [LDP&] The world scan in LDP form.
@@ -1906,7 +1832,6 @@ CBGL::processScan(LDP& world_scan_ldp, LDP& map_scan_ldp,
   ROS_DEBUG("[CBGL] Scan matcher total duration: %.1f ms", dur);
 }
 
-
 /*******************************************************************************
 */
   std::vector<double>
@@ -1919,7 +1844,6 @@ CBGL::retypeScan(const sensor_msgs::LaserScan::Ptr& scan_msg)
 
   return ret_vector;
 }
-
 
 /*******************************************************************************
  * @brief The laser scan callback
@@ -2002,7 +1926,6 @@ CBGL::scanCallback(
   if (received_map_ && received_pose_cloud_ && received_start_signal_)
     processPoseCloud();
 }
-
 
 /*******************************************************************************
  * @brief Given the robot's pose and a choice to scan over an angle of 2π,
@@ -2120,7 +2043,6 @@ CBGL::scanMap(
   return map_scan;
 }
 
-
 /*******************************************************************************
 */
   sensor_msgs::LaserScan::Ptr
@@ -2216,77 +2138,6 @@ CBGL::scanMapPanoramic(
 
   return map_scan;
 }
-
-
-/*******************************************************************************
- * @brief Takes all pose hypotheses, computes their caer against the real scan,
- * and ranks them. Only p% of all poses are then considered for smsm.
- * DEPRECATED
- */
-  std::vector<geometry_msgs::Pose::Ptr>
-CBGL::siftThroughCAER(
-  const std::vector<geometry_msgs::Pose::Ptr>& all_hypotheses)
-{
-  /*
-  // The real scan
-  sensor_msgs::LaserScan::Ptr sr =
-  boost::make_shared<sensor_msgs::LaserScan>(*latest_world_scan_);
-
-  // Compute all caers
-  std::vector<double> caers;
-  std::vector<double> scan_map_times;
-  std::vector<double> caer_times;
-  for (unsigned int i = 0; i < all_hypotheses.size(); i++)
-  {
-  ros::Time s1 = ros::Time::now();
-  // Compute the virtual scan from pose hypothesis i
-  sensor_msgs::LaserScan::Ptr sv_i = scanMap(all_hypotheses[i],
-  map_scan_method_, false);
-  ros::Time s2 = ros::Time::now();
-
-  // Compute caer for this virtual scan
-  ros::Time c1 = ros::Time::now();
-  double c = caer(sr,sv_i);
-  ros::Time c2 = ros::Time::now();
-  if (c != 0.0)
-  caers.push_back(c);
-  else
-  caers.push_back(std::numeric_limits<double>::max());
-
-  sv_i.reset();
-
-  scan_map_times.push_back((s2-s1).toSec());
-  caer_times.push_back((c2-c1).toSec());
-  }
-
-  ROS_WARN("scan_map took %f sec",
-  std::accumulate(scan_map_times.begin(), scan_map_times.end(), 0.0));
-  ROS_WARN("caers    took %f sec",
-  std::accumulate(caer_times.begin(), caer_times.end(), 0.0));
-
-  // Sort all caers and get the original indices of all sorted caer values
-  std::vector<size_t> idx(caers.size());
-  std::iota(idx.begin(), idx.end(), 0);
-
-  std::stable_sort(
-  idx.begin(),
-  idx.end(),
-  [&caers](size_t i1,size_t i2) {return caers[i1] < caers[i2];});
-
-
-
-  // The top p% of lowest caers in size
-  unsigned int p_size = top_k_caers_;
-
-  // The top p% of lowest caers in hypotheses
-  std::vector<geometry_msgs::Pose::Ptr> caer_best_particles;
-  for (unsigned int i = 0; i < p_size; i++)
-  caer_best_particles.push_back(all_hypotheses[idx[i]]);
-
-  return caer_best_particles;
-  */
-}
-
 
 /*******************************************************************************
  * @brief Takes all pose hypotheses, computes their caer against the real scan,
@@ -2409,7 +2260,6 @@ CBGL::siftThroughCAERPanoramic(
   return caer_best_particles;
 }
 
-
 /*******************************************************************************
 */
   bool
@@ -2472,7 +2322,6 @@ CBGL::startSignalService(
   return received_start_signal_;
 }
 
-
 /*******************************************************************************
 */
   pf_vector_t
@@ -2507,7 +2356,6 @@ CBGL::uniformPoseGenerator(void* arg)
   return p;
 }
 
-
 /*******************************************************************************
  * @brief Visualisation of world and map scans
  * @param[in] world_scan [const LDP&] The world scan in LDP form
@@ -2525,7 +2373,6 @@ CBGL::visualiseScans(
   world_scan_publisher_.publish(world_laser_scan);
   map_scan_publisher_.publish(map_laser_scan);
 }
-
 
 /*******************************************************************************
  * @brief Wraps an angle in the [-π, π] interval

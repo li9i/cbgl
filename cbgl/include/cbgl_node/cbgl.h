@@ -128,7 +128,6 @@ class CBGL
     ros::Publisher top_caer_hypotheses_publisher_ ;
     ros::Publisher world_scan_publisher_;
     ros::Publisher map_scan_publisher_;
-    ros::Publisher status_publisher_;
 
     // **** parameters
 
@@ -557,8 +556,6 @@ class CBGL
 
     /*****************************************************************************
     */
-    std::vector<geometry_msgs::Pose::Ptr> siftThroughCAER(
-      const std::vector<geometry_msgs::Pose::Ptr>& all_hypotheses);
     std::vector<geometry_msgs::Pose::Ptr> siftThroughCAERPanoramic(
       const std::vector<geometry_msgs::Pose::Ptr>& init_hypotheses);
 
