@@ -9,7 +9,7 @@
     <!-- CSM parameters (when FOV <= 2π) -->
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_csm.yaml" />
 
-    <!-- FSM parameters (when FOV = 2π)-->
+    <!-- FSM parameters (when FOV = 2π) -->
     <rosparam command="load" file="$(find cbgl)/configuration_files/params_fsm.yaml" />
 
   </node>

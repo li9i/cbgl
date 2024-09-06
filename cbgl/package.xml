@@ -2,7 +2,7 @@
 <package format="2">
   <name>cbgl</name>
   <version>1.0.1</version>
-  <description>The caer-based global localisation package</description>
+  <description>The Caer-Based Global Localisation package</description>
 
   <maintainer email="alefilot@auth.gr">li9i</maintainer>
 

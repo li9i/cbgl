@@ -13,8 +13,6 @@ include_directories(include
   /usr/include/eigen3/
 )
 
-
-#Note we don't link against pcl as we're using header-only parts of the library
 target_link_libraries(cbgl_lib
   fftw3
   CGAL::CGAL_Core
