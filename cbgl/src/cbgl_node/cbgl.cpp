@@ -1,5 +1,3 @@
-#include <boost/assign.hpp>
-#include <pcl_conversions/pcl_conversions.h>
 #include <cbgl_node/cbgl.h>
 
 #define DEBUG_EXECUTION_TIMES 0
@@ -146,6 +144,7 @@ void CBGL::broadcast_global_pose_tf(
 }
 
 /*******************************************************************************
+ * @brief Calculation of the cumulative absolute error per ray metric
 */
 double CBGL::caer(
   const sensor_msgs::LaserScan::Ptr& sr,
@@ -760,8 +759,6 @@ CBGL::handleInputPose(const geometry_msgs::Pose::Ptr& pose_msg,
     doICP(pose_msg, world_scan, output, f2b);
   if (do_fsm_)
     doFSM(pose_msg, world_scan, output, f2b);
-
-
 
   // GUARD stand-down
   running_ = false;
@@ -1598,9 +1595,9 @@ void CBGL::processPoseCloud()
 
   // Construct the 3rd-party ray-casters AFTER both a scan and the map is
   // received
-  bool cond = received_scan_         &&
-    received_pose_cloud_   &&
-    received_start_signal_ &&
+  bool cond = received_scan_ &&
+    received_pose_cloud_     &&
+    received_start_signal_   &&
     received_map_;
 
   if (!cond)
@@ -1608,7 +1605,6 @@ void CBGL::processPoseCloud()
 
   // Init raycasters with laser details
   initRangeLibRayCasters();
-
 
   // Publish all hypotheses
   if (publish_pose_sets_)
@@ -1833,6 +1829,7 @@ CBGL::processScan(LDP& world_scan_ldp, LDP& map_scan_ldp,
 }
 
 /*******************************************************************************
+ * For use with FSM
 */
   std::vector<double>
 CBGL::retypeScan(const sensor_msgs::LaserScan::Ptr& scan_msg)
@@ -2044,7 +2041,18 @@ CBGL::scanMap(
 }
 
 /*******************************************************************************
-*/
+ * @brief Given the robot's pose and a choice to scan over an angle of 2π,
+ * this function simulates a range scan that has the physical world
+ * substituted for the map.
+ * @param[in] robot_pose
+ * [const geometry_msgs::Pose::Ptr&] The robot's pose.
+ * @param[in] scan_method [const std::string&] Which method to use for
+ * scanning the map. Currently supports vanilla (Bresenham's method)
+ * and ray_marching.
+ * @param[in] do_fill_map_scan [const bool&] A choice to scan over an angle of
+ * 2π.
+ * @return [sensor_msgs::LaserScan::Ptr] The map scan in LaserScan form.
+ */
   sensor_msgs::LaserScan::Ptr
 CBGL::scanMapPanoramic(
   const geometry_msgs::Pose::Ptr& robot_pose,
@@ -2209,16 +2217,14 @@ CBGL::siftThroughCAERPanoramic(
   }
 
   /*
-     for (unsigned int i = 0; i < all_hypotheses.size(); i=i+da_)
-     {
-     ROS_INFO("(%f,%f,%f)",
-     all_hypotheses[i]->position.x,
-     all_hypotheses[i]->position.y,
-     extractYawFromPose(*all_hypotheses[i]));
-     }
-     */
+  for (unsigned int i = 0; i < all_hypotheses.size(); i=i+da_)
+  {
+  ROS_INFO("(%f,%f,%f)",
+  all_hypotheses[i]->position.x,
+  all_hypotheses[i]->position.y,
+  extractYawFromPose(*all_hypotheses[i]));
+  }
 
-  /*
   // Publish ALL CAERS
   geometry_msgs::PoseArray pa2;
   pa2.header.stamp = ros::Time::now();
@@ -2261,6 +2267,7 @@ CBGL::siftThroughCAERPanoramic(
 }
 
 /*******************************************************************************
+ * @brief User calls this service and cbgl functionality is executed
 */
   bool
 CBGL::startSignalService(
@@ -2323,7 +2330,9 @@ CBGL::startSignalService(
 }
 
 /*******************************************************************************
-*/
+ * @brief Pose disperser
+ * @return [pf_vector_t] Uniformly random pose set over arg
+ */
   pf_vector_t
 CBGL::uniformPoseGenerator(void* arg)
 {

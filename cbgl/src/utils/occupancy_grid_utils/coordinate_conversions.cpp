@@ -44,6 +44,8 @@ namespace occupancy_grid_utils
 namespace gm=geometry_msgs;
 namespace nm=nav_msgs;
 
+/*******************************************************************************
+ */
 gm::Polygon cellPolygon (const nm::MapMetaData& info, const Cell& c)
 {
   const float v = 1.0;
@@ -63,7 +65,8 @@ gm::Polygon cellPolygon (const nm::MapMetaData& info, const Cell& c)
   return p;
 }
 
-
+/*******************************************************************************
+ */
 gm::Polygon gridPolygon (const nm::MapMetaData& info)
 {
   const float v = 1.0;
@@ -85,12 +88,13 @@ gm::Polygon gridPolygon (const nm::MapMetaData& info)
   return p;
 }
 
+/*******************************************************************************
+ */
 void verifyDataSize (const nm::OccupancyGrid& g)
 {
   const size_t expected = g.info.height*g.info.width;
   if (expected!=g.data.size())
     throw DataSizeException(expected, g.data.size());
 }
-
 
 } // namespace

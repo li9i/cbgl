@@ -47,6 +47,7 @@
 #include <iostream>
 #include <time.h>
 #include <limits.h>
+#include <boost/assign.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -69,10 +70,10 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
+#include <pcl_conversions/pcl_conversions.h>
 #include <utils/fsm_core.h>
 #include "utils/map/map.h"
 #include "utils/pf/pf.h"
-
 #include <csm/csm_all.h>  // csm defines min and max, but Eigen complains
 #include <egsl/egsl_macros.h>
 
@@ -82,7 +83,6 @@
 #include "utils/range_libc/includes/RangeLib.h"
 #include "utils/range_libc/vendor/lodepng/lodepng.h"
 #include "utils/occupancy_grid_utils/ray_tracer.h"
-
 
 
 class CBGL
@@ -182,9 +182,7 @@ class CBGL
     bool icp_do_invalidate_diff_rays_;
     double icp_invalidate_diff_rays_epsilon_;
 
-
     // DFT variables introduced by us
-    // Visualisation params introduced by us
     bool icp_visual_debug_;
     bool icp_do_publish_scans_;
 
@@ -248,35 +246,36 @@ class CBGL
     int top_k_caers_;
     bool publish_pose_sets_;
 
+
     // **** methods
 
-    /*****************************************************************************
+
+    /***************************************************************************
      * @brief Broadcasts the estimated pose as the odom<--map transform
      */
     void broadcast_global_pose_tf(
       const geometry_msgs::Pose& pose);
 
-    /*****************************************************************************
+    /***************************************************************************
+     * @brief Calculation of the cumulative absolute error per ray metric
     */
     double caer(const sensor_msgs::LaserScan::Ptr& sr,
       const sensor_msgs::LaserScan::Ptr& sv);
     double caer(const std::vector<float>& sr,
       const std::vector<float>& sv);
 
-    /*****************************************************************************
+    /***************************************************************************
      * Used by FSM
      */
     void cacheFFTW3Plans(const unsigned int& sz);
 
-
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Convert an OccupancyGrid map message into the internal
      * representation. This allocates a map_t and returns it. Stolen from amcl.
      */
     map_t* convertMap(const nav_msgs::OccupancyGrid& map_msg);
 
-
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Convert an OccupancyGrid map message into a unsigned char* array.
      * If this array is immediately inputted to lodepng::encode the latter
      * returns 0.
@@ -289,7 +288,7 @@ class CBGL
       const nav_msgs::OccupancyGrid& map_msg,
       unsigned char* converted);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Convert an OccupancyGrid map message into a unsigned char* array,
      * encode it into PNG, and store the image to file.
      * @param[in] map_msg [const nav_msgs::OccupancyGrid&] The map message to be
@@ -302,7 +301,7 @@ class CBGL
       const nav_msgs::OccupancyGrid& map_msg,
       const std::string& filename);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Copies a source LDP structure to a target one.
      * @param[in] source [const LDP&] The source structure
      * @param[out] target [LDP&] The destination structure
@@ -310,7 +309,7 @@ class CBGL
      */
     void copyLDP(const LDP& source, LDP& target);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Regarding a single ray with index id, this function copies data
      * from a ray of the source LDP structure to that of a target one.
      * @param[in] source [const LDP&] The source structure
@@ -320,7 +319,7 @@ class CBGL
      */
     void copyRayDataLDP(const LDP& source, LDP& target, const int& id);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Regarding the metadata from a source LDP, copy them to a
      * a target LDP.
      * @param[in] source [const LDP&] The source structure
@@ -329,7 +328,7 @@ class CBGL
      */
     void copyMetaDataLDP(const LDP& source, LDP& target);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief This function uses the icp result for correcting the amcl pose.
      * Given the icp output, this function express this correction in the
      * map frame. The result is the icp-corrected pose in the map frame.
@@ -341,7 +340,7 @@ class CBGL
     void correctICPPose(geometry_msgs::Pose::Ptr& icp_corrected_pose,
       const tf::Transform& f2b);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Creates a transform from a 2D pose (x,y,theta)
      * @param[in] x [const double&] The x-wise coordinate of the pose
      * @param[in] y [const double&] The y-wise coordinate of the pose
@@ -351,7 +350,21 @@ class CBGL
     void createTfFromXYTheta(const double& x, const double& y,
       const double& theta, tf::Transform& t);
 
-    /*****************************************************************************
+   /****************************************************************************
+    * @brief Given the amcl pose and a world scan, this function corrects
+    * the pose by ICP-ing the world scan and a map scan taken at the amcl pose
+    * @param[in] amcl_pose_msg [const geometry_msgs::Pose::Ptr&]
+    * The amcl pose
+    * @param[in] latest_world_scan [const sensor_msgs::LaserScan::Ptr&] The real
+    * laser scan
+    * @return void
+    * pose
+    */
+    void doFSM(const geometry_msgs::Pose::Ptr& amcl_pose_msg,
+      const sensor_msgs::LaserScan::Ptr& latest_world_scan,
+      sm_result* output, tf::Transform* f2b);
+
+    /***************************************************************************
      * @brief Given the amcl pose and a world scan, this function corrects
      * the pose by ICP-ing the world scan and a map scan taken at the amcl pose
      * @param[in] amcl_pose_msg
@@ -363,37 +376,33 @@ class CBGL
     void doICP(const geometry_msgs::Pose::Ptr& amcl_pose_msg,
       const sensor_msgs::LaserScan::Ptr& latest_world_scan,
       sm_result* output, tf::Transform* f2b);
-    void doFSM(const geometry_msgs::Pose::Ptr& amcl_pose_msg,
-      const sensor_msgs::LaserScan::Ptr& latest_world_scan,
-      sm_result* output, tf::Transform* f2b);
 
-
-    /*****************************************************************************
+    /***************************************************************************
     */
     void dumpScan(const LDP& real_scan, const LDP& virtual_scan);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Extracts the yaw component from the input pose's quaternion.
      * @param[in] pose [const geometry_msgs::Pose&] The input pose
      * @return [double] The pose's yaw
      */
     double extractYawFromPose(const geometry_msgs::Pose& pose);
 
-    /*******************************************************************************
+    /***************************************************************************
      * @brief Calculates the area of the free space of a map
      * @param[in] map [map_t*] Guess what
      * @return [double] Its area
      */
     double freeArea(map_t* map);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Finds the transform between the laser frame and the base frame
      * @param[in] frame_id [const::string&] The laser's frame id
      * @return [bool] True when the transform was found, false otherwise.
      */
     bool getBaseToLaserTf (const std::string& frame_id);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Given the robot's pose in the map frame, this function returns the
      * laser's pose in the map frame.
      * @param[in] robot_pose [const geometry_msgs::Pose&] The robot's pose in the
@@ -403,7 +412,7 @@ class CBGL
     geometry_msgs::Pose getCurrentLaserPose(
       const geometry_msgs::Pose& robot_pose);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief This is where all the magic happens
      * @param[in] pose_msg [const geometry_msgs::Pose::Ptr&]
      * The amcl pose wrt to the map frame
@@ -412,13 +421,13 @@ class CBGL
     void handleInputPose(const geometry_msgs::Pose::Ptr& pose_msg,
       sm_result* output, tf::Transform* f2b);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Initializes parameters
      * @return void
      */
     void initParams();
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Initialises the ray-casters from the RangeLib library. Since they
      * take as arguments the maximum range of the lidar and the resolution of the
      * map, and these are unknown before being received, this function should be
@@ -428,13 +437,13 @@ class CBGL
      */
     void initRangeLibRayCasters();
 
-    /*******************************************************************************
+    /***************************************************************************
      * Identify contiguous regions of false measurements
      */
     std::vector<float> interpolateRanges(
       const std::vector<float>& ranges, const float& idd);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Converts a LaserScan laser scan to a LDP structure.
      * @param[in] scan_msg [const sensor_msgs::LaserScan::Ptr&] The input
      * scan
@@ -444,25 +453,27 @@ class CBGL
     void laserScanToLDP(const sensor_msgs::LaserScan::Ptr& scan_msg,
       LDP& ldp);
 
+    /***************************************************************************
+     */
     void ldp2points(const LDP& scan,
       const std::tuple<double,double,double> pose,
       std::vector< std::pair<double,double> >* points);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Converts a LDP structure to a LaserScan laser scan
      * @param[in] ldp [const LDP&] The input LDP laser scan
      * @return [sensor_msgs::LaserScan::Ptr] The output LaserScan laser scan
      */
     sensor_msgs::LaserScan::Ptr ldpTolaserScan(const LDP& ldp);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Stores the map upon receipt. (The map does not change through time)
      * @param[in] map_msg [const nav_msgs::OccupancyGrid] The map
      * @return void
      */
     void mapCallback (const nav_msgs::OccupancyGrid& map);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Publishes the pipeline's latest execution time.
      * @param[in] start [const ros::Time&] The start time of the pipeline's
      * execution
@@ -470,7 +481,7 @@ class CBGL
      */
     void measureExecutionTime(const ros::Time& start, const ros::Time& end);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Checks if there are nan's in an input pose.
      * @param[in] pose_msg [const geometry_msgs::Pose::Ptr&]
      * The input pose
@@ -480,7 +491,7 @@ class CBGL
     bool nanInPose(
       const geometry_msgs::Pose::Ptr& pose_msg);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Returns the number of rays that correspond to an angle range
      * based on known values of minimum and maximum angle, and the number of rays
      * that correspond to them.
@@ -495,7 +506,7 @@ class CBGL
     int numRaysFromAngleRange(const double& angle_min, const double& angle_max,
       const int& num_rays, const double& new_range);
 
-    /*******************************************************************************
+    /***************************************************************************
      * @brief The amcl cloud pose callback. This is the point of entry
      * @param[in] pose_cloud_msg [const geometry_msgs::PoseArray::Ptr&]
      * The amcl pose wrt to the map frame
@@ -504,13 +515,13 @@ class CBGL
     void poseCloudCallback(
       const geometry_msgs::PoseArray::Ptr& pose_cloud_msg);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief
      * @return void
      */
     void processPoseCloud();
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief The champion function of the ICP operation.
      * @param[in] world_scan_ldp [LDP&] The world scan in LDP form.
      * @param[in] map_scan_ldp [LDP&] The map scan in LDP form.
@@ -519,13 +530,12 @@ class CBGL
     void processScan(LDP& world_scan_ldp, LDP& map_scan_ldp,
       sm_result* output, tf::Transform* f2b);
 
-
-    /*****************************************************************************
+    /***************************************************************************
      * For use with FSM
      */
     std::vector<double> retypeScan(const sensor_msgs::LaserScan::Ptr& scan_msg);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief The laser scan callback
      * @param[in] scan_msg [const sensor_msgs::LaserScan::Ptr&] The input
      * scan message
@@ -533,7 +543,7 @@ class CBGL
      */
     void scanCallback (const sensor_msgs::LaserScan::Ptr& scan_msg);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Given the robot's pose and a choice to scan over an angle of 2π,
      * this function simulates a range scan that has the physical world
      * substituted for the map.
@@ -554,40 +564,26 @@ class CBGL
       const geometry_msgs::Pose::Ptr& robot_pose,
       const std::string& scan_method);
 
-    /*****************************************************************************
-    */
+    /***************************************************************************
+     * @brief Takes all pose hypotheses, computes their caer against the real
+     * scan and ranks them. Only p% of all poses are then considered for sm2
+     */
     std::vector<geometry_msgs::Pose::Ptr> siftThroughCAERPanoramic(
       const std::vector<geometry_msgs::Pose::Ptr>& init_hypotheses);
 
-    /*****************************************************************************
+    /***************************************************************************
+     * @brief User calls this service and cbgl functionality is executed
     */
     bool startSignalService(std_srvs::Empty::Request& req,
       std_srvs::Empty::Response& res);
 
-    /*****************************************************************************
-     * @brief Transforms a laser scan into the points of its ray-ends. Used to
-     * visualise the transform of the map_scan and compare it against the world
-     * scan @param[in] amcl_pose
-     * [const geometry_msgs::Pose::Ptr&] The robot's pose
-     * @param[in] scan [const sensor_msgs::LaserScan::Ptr&] The laser scan
-     * (should be a map scan)
-     * @param[in] transform [const tf::Transform&] The transform from the map scan
-     * to the world scan
-     * @return [geometry_msgs::PoseArray] An array of poses. The poses are the
-     * points of the end of the rays of the map scan in the map frame.
-     */
-    geometry_msgs::PoseArray transformLaserScan(
-      const geometry_msgs::Pose::Ptr& amcl_pose,
-      const sensor_msgs::LaserScan::Ptr& scan,
-      const tf::Transform& transform);
-
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Pose disperser
      * @return [pf_vector_t] Uniformly random pose set over arg
      */
     static pf_vector_t uniformPoseGenerator(void* arg);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Visualisation of world and map scans
      * @param[in] world_scan [const LDP&] The world scan in LDP form
      * @param[in] map_scan [const LDP&] The map scan in LDP form
@@ -595,14 +591,14 @@ class CBGL
      */
     void visualiseScans(const LDP& world_scan, const LDP& map_scan);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Wraps an angle in the [-π, π] interval
      * @param[in,out] angle [double&] The angle to be expressed in [-π,π]
      * @return void
      */
     void wrapAngle(double& angle);
 
-    /*****************************************************************************
+    /***************************************************************************
      * @brief Wraps a pose's orientation in the [-π,π] interval
      * @param[in,out] pose [geometry_msgs::Pose::Ptr&] The
      * pose whose input will be wrapped in [-π,π]

@@ -37,11 +37,11 @@ extern "C" {
 // Forward declarations
 struct _rtk_fig_t;
 
-  
+
 // Limits
 #define MAP_WIFI_MAX_LEVELS 8
 
-  
+
 // Description for a single map cell.
 typedef struct
 {
@@ -62,72 +62,92 @@ typedef struct
 {
   // Map origin; the map is a viewport onto a conceptual larger map.
   double origin_x, origin_y;
-  
+
   // Map scale (m/cell)
   double scale;
 
   // Map dimensions (number of cells)
   int size_x, size_y;
-  
+
   // The map data, stored as a grid
   map_cell_t *cells;
 
   // Max distance at which we care about obstacles, for constructing
   // likelihood field
   double max_occ_dist;
-  
+
 } map_t;
 
 
 
-/**************************************************************************
+/*******************************************************************************
  * Basic map functions
- **************************************************************************/
+ ******************************************************************************/
 
+/*******************************************************************************
+ */
 // Create a new (empty) map
 map_t *map_alloc(void);
 
+/*******************************************************************************
+ */
 // Destroy a map
 void map_free(map_t *map);
 
+/*******************************************************************************
+ */
 // Get the cell at the given point
 map_cell_t *map_get_cell(map_t *map, double ox, double oy, double oa);
 
+/*******************************************************************************
+ */
 // Load an occupancy map
 int map_load_occ(map_t *map, const char *filename, double scale, int negate);
 
+/*******************************************************************************
+ */
 // Load a wifi signal strength map
 //int map_load_wifi(map_t *map, const char *filename, int index);
 
+/*******************************************************************************
+ */
 // Update the cspace distances
 void map_update_cspace(map_t *map, double max_occ_dist);
 
 
-/**************************************************************************
+/*******************************************************************************
  * Range functions
- **************************************************************************/
+ ******************************************************************************/
 
+/*******************************************************************************
+ */
 // Extract a single range reading from the map
 double map_calc_range(map_t *map, double ox, double oy, double oa, double max_range);
 
 
-/**************************************************************************
+/*******************************************************************************
  * GUI/diagnostic functions
- **************************************************************************/
+ ******************************************************************************/
 
+/*******************************************************************************
+ */
 // Draw the occupancy grid
 void map_draw_occ(map_t *map, struct _rtk_fig_t *fig);
 
+/*******************************************************************************
+ */
 // Draw the cspace map
 void map_draw_cspace(map_t *map, struct _rtk_fig_t *fig);
 
+/*******************************************************************************
+ */
 // Draw a wifi map
 void map_draw_wifi(map_t *map, struct _rtk_fig_t *fig, int index);
 
 
-/**************************************************************************
+/*******************************************************************************
  * Map manipulation macros
- **************************************************************************/
+ *******************************************************************************/
 
 // Convert from map index to world coords
 #define MAP_WXGX(map, i) (map->origin_x + ((i) - map->size_x / 2) * map->scale)

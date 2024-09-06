@@ -18,12 +18,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/**************************************************************************
+/*******************************************************************************
  * Desc: Global map (grid-based)
  * Author: Andrew Howard
  * Date: 6 Feb 2003
  * CVS: $Id: map.c 1713 2003-08-23 04:03:43Z inspectorg $
-**************************************************************************/
+*******************************************************************************/
 
 #include <assert.h>
 #include <math.h>
@@ -33,7 +33,8 @@
 
 #include "utils/map/map.h"
 
-
+/*******************************************************************************
+ */
 // Create a new map
 map_t *map_alloc(void)
 {
@@ -56,7 +57,8 @@ map_t *map_alloc(void)
   return map;
 }
 
-
+/*******************************************************************************
+ */
 // Destroy a map
 void map_free(map_t *map)
 {
@@ -65,7 +67,8 @@ void map_free(map_t *map)
   return;
 }
 
-
+/*******************************************************************************
+ */
 // Get the cell at the given point
 map_cell_t *map_get_cell(map_t *map, double ox, double oy, double oa)
 {
@@ -81,4 +84,3 @@ map_cell_t *map_get_cell(map_t *map, double ox, double oy, double oa)
   cell = map->cells + MAP_INDEX(map, i, j);
   return cell;
 }
-

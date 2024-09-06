@@ -27,7 +27,6 @@ RayTraceIterRange rayTrace (const Cell& c1, const Cell& c2)
     RayTraceIterator(c1,c2), RayTraceIterator(c2,c2,true));
 }
 
-
 /*******************************************************************************
  */
 inline
@@ -35,7 +34,6 @@ bool cellWithinBounds (const nm::MapMetaData& info, const Cell& c)
 {
   return withinBounds(info, c);
 }
-
 
 /*******************************************************************************
  */
@@ -53,7 +51,6 @@ optional<Cell> rayTraceOntoGrid (const nm::MapMetaData& info, const Cell& c1,
 
   return c;
 }
-
 
 /*******************************************************************************
  */
@@ -112,7 +109,6 @@ RayTraceIterRange rayTrace (const nm::MapMetaData& info, const gm::Point& p1,
 
   return rayTrace(c1, c2);
 }
-
 
 /*******************************************************************************
  */
@@ -206,7 +202,6 @@ private:
   double angle_increment_;
 };
 
-
 /*******************************************************************************
  */
 sm::LaserScan::Ptr simulateRangeScan (const nm::OccupancyGrid& grid,
@@ -245,9 +240,7 @@ sm::LaserScan::Ptr simulateRangeScan (const nm::OccupancyGrid& grid,
       }
     }
   }
-
   return result;
 }
-
 
 } // namespace occupancy_grid_utils
