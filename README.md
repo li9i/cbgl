@@ -118,17 +118,14 @@ docker exec -it cbgl_container sh -c "source ~/catkin_ws/devel/setup.bash; rosse
 
 ## Citation
 
-The theoretical underpinning, key aspects, and experimental performance of CBGL are presented in the preprint cited through
+The theoretical underpinning, key aspects, and experimental performance of CBGL are presented in the 2024 IEEE/RSJ International Conference on Intelligent Robots and Systems article cited through
 
 ```bibtex
-@article{cbgl,
-  title={CBGL: Fast Monte Carlo Passive Global Localisation of 2D LIDAR Sensor},
+@INPROCEEDINGS{10802235,
   author={Filotheou, Alexandros},
-  journal={arXiv:2307.14247},
-  url={https://arxiv.org/abs/2307.14247}
-  year={2023}}
+  booktitle={2024 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  title={CBGL: Fast Monte Carlo Passive Global Localisation of 2D LIDAR Sensor},
+  year={2024},
+  pages={3268-3275},
+  doi={10.1109/IROS58592.2024.10802235}}
 ```
-
-Update JUN 2024: CBGL has been accepted for publication in the Proceedings of
-the 2024 IEEE/RSJ International Conference on Intelligent Robots and Systems
-(IROS 2024)
