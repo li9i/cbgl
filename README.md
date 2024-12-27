@@ -2,9 +2,6 @@
 
 [![ieeexplore.ieee.org](https://img.shields.io/badge/IEEE/RSJ_IROS_2024_paper-00629B)](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10802235) [![youtube.com](https://img.shields.io/badge/2'_presentation-YouTube-FF0000)](https://www.youtube.com/watch?v=xaDKjI0WkDc) [![youtube.com](https://img.shields.io/badge/In_depth-YouTube-FF0000)](https://www.youtube.com/watch?v=TvTNEDGp-NU)
 
-
-
-
 `cbgl` is a ROS package written in C++ that allows you to localise your 2D LIDAR sensor in a given 2D occupancy grid map under global uncertainty in position and orientation, in minimal time
 
 - You can expect the execution time to roughly have an order of magnitude of $`10e \cdot \text{area} \cdot N_s`$ microseconds, where $\text{area}$ is the area of the map's free space and $`N_s`$ is the LIDAR's number of rays. (Strictly speaking the execution time varies according to the geometry of the environment and other factors.) In the video below the environment area is $`2000`$ m$`^2`$ and localisation is performed in under four seconds
@@ -15,6 +12,7 @@
 Click on the image for a brief demo
 [![CBGL in Willowgarage](https://img.youtube.com/vi/DkKdxFNJG4g/maxresdefault.jpg)](https://youtu.be/DkKdxFNJG4g)
 -->
+
 https://github.com/li9i/cbgl/assets/1658819/5794cd21-651d-4924-b453-25c46b9e42a9
 
 <sub>A panoramic 2D LIDAR sensor mounted on a turtlebot 2 is spawned into
@@ -25,17 +23,15 @@ robot at a second challenging pose, at which she calls it for a second time.
 Both times `cbgl` is successful in estimating the sensor's pose. Sensor
 characteristics: $`N_s = 360`$ rays; noise: $`\sim \mathcal{N} (0.0, 0.05^2)`$ [m,m$`^2`$]</sub>
 
-
 ## Why use CBGL
 
 <p align="center">
   <img src="https://i.imgur.com/kAD8AmS.png?1">
 </p>
 
-
-
 Table of Contents
 =================
+
 * [Pre-installation](#pre-installation)
 * [Install](#install)
 * [Run](#run)
@@ -45,16 +41,12 @@ Table of Contents
 * [Motivation](#motivation)
 * [More results](#more-results)
 
-
-
 ## Pre-installation
 
 `cbgl` is installed, launched, and called via Docker:
 
 - if this is your first time running docker then I happen to find [this](https://youtu.be/SAMPOK_lazw?t=67) docker installation guide very friendly and easy to follow
 - if instead you wish to install and run the package natively in Ubuntu 16.04, see the [INSTALLATION_DEPRECATED.md](https://github.com/li9i/cbgl/blob/master/INSTALLATION_DEPRECATED.md) guide.
-
-
 
 ## Install
 
@@ -66,11 +58,26 @@ cd cbgl
 docker compose build
 ```
 
-or pull the docker image and run it with
+or pull it:
 
 ```sh
 docker pull li9i/cbgl:latest
+```
 
+## Run
+
+### Launch
+
+If you cloned the repository then you may run the image via `compose`
+
+```sh
+cd cbgl
+docker compose up
+```
+
+or, in any case, you may run the image with
+
+```sh
 docker run -it \
     --name=container_cbgl \
     --net=host \
@@ -78,25 +85,13 @@ docker run -it \
     li9i/cbgl:latest
 ```
 
-
-
-## Run
-
-### Launch
-
-```sh
-docker compose up
-```
-
 ### Call
 
-Launching `cbgl` simply makes it go into stand-by mode and does not actually execute global localisation. To do so simply call the provided service
+Launching `cbgl` simply makes it go into stand-by mode and does not actually localise your sensor. To do so simply call the provided service
 
 ```sh
 docker exec -it cbgl_container sh -c "source ~/catkin_ws/devel/setup.bash; rosservice call global_localization"
 ```
-
-
 
 ## Input/output at a glance
 
